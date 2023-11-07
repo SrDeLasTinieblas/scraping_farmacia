@@ -1,0 +1,140 @@
+import requests
+import json
+from model.Models import Product
+from pages.base.base import Page
+
+def get_data(page_url):
+        url = page_url
+        payload = {}
+        headers = {}
+        response = requests.request("GET", url, headers=headers, data=payload)   
+        return response.json()
+    
+class InkaFarma(Page):
+    
+    def __init__(self, title, url):
+        super().__init__(title, url)
+
+    def main(self):
+        category_url = "https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/MMPROD/departments?companyCode=IKF&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
+        data = get_data(category_url)
+                
+        categorys = []
+        for item in data:
+            #category_parent = CategoryParent(item["id"], item["name"])
+            #if item["categories"]:
+                #for subcategory_data in item["categories"]:
+                #    if subcategory_data["subCategories"]:
+                #        for subsubcategory_data in subcategory_data["subCategories"]:
+                #            subsubcategory = CategoryChild(subsubcategory_data["id"], subsubcategory_data["name"])
+                #            category_parent.add_subcategory(subsubcategory)
+                #    else:
+                #        subcategory = CategoryChild(subcategory_data["id"], subcategory_data["name"])
+                #        category_parent.add_subcategory(subcategory)     
+            
+            categorys.append(item["id"])                              
+                
+        
+        return categorys
+    
+    def get_product_urls(self, category_parent_list):
+            
+        products = []
+        fil = category_parent_list[:5]
+        
+        for category in fil:
+            print("category", category.title)
+            try:
+                url = "https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/MMPROD/filtered-products?companyCode=IKF&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
+                department_id = category.url
+
+                payload = json.dumps({
+                    "departmentsFilter": [department_id],
+                    "categoriesFilter": [],
+                    "subcategoriesFilter": [],
+                    "brandsFilter": [],
+                    "ranking": None,
+                    "page": 0,
+                    "rows": 1,
+                    "order": "ASC",
+                    "sort": "ranking",
+                    "productsFilter": []
+                })
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0',
+                    'Accept': 'application/json, text/plain, */*',
+                    'Accept-Language': 'en-US,en;q=0.5',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    'AndroidVersion': '100000',
+                    'drugstore-stock': '1253',
+                    'Content-Type': 'application/json',
+                    'Origin': 'https://inkafarma.pe',
+                    'Connection': 'keep-alive',
+                    'Referer': 'https://inkafarma.pe/',
+                    'Sec-Fetch-Dest': 'empty',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Site': 'cross-site',
+                    'TE': 'trailers'
+                }
+
+               
+                response = requests.request("POST", url, headers=headers, data=payload)
+
+                total_records = response.json()
+                
+                payload_dict = json.loads(payload)
+                payload_dict["rows"] = total_records.get("totalRecords")
+                payload = json.dumps(payload_dict)            
+            
+                timeout = 300  
+                #response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+                response = requests.request("POST", url, headers=headers, data=payload, timeout=timeout)                
+                
+                if response.status_code == 200:
+                    data = response.json()   
+                 
+                    if data["rows"]:
+                        for row in data['rows']:
+                            product = Product(
+                                images=[image['url'] for image in row['imageList']],
+                                title=row['name'],
+                                quantity=row['fractionatedText'],
+                                regular_price=row['unitPrice'],
+                                sale_price=row['unitPriceWithPaymentMethod'],
+                                description=row['shortDescription'],
+                                url=row['id'],
+                            )
+                            products.append(product)
+                    else:
+                        print("No se encuentra rows", data)
+                else:
+                    print(f"Error en la solicitud HTTP. Código de estado: {response.status_code}")
+                    print(f"Error en la solicitud HTTP. Mensaje: {response.text}")
+
+                
+            except Exception as e:
+                print(f"Se produjo una excepción: {str(e)}")
+            
+        return products
+                    
+                            
+    def details_product(self, product):
+        # Simulación: Toma un objeto Product y devuelve detalles específicos
+        return product
+    
+    
+    def getTokenInka():
+        url = "https://raw.githubusercontent.com/ProgramandoWebadas/Pharmacy-Tokens/main/tokenInka.json"
+        payload = {}
+        headers = {}
+        response = requests.request("GET", url, headers=headers, data=payload)   
+        data = response.json()
+        token = data.get("token")
+        return token
+    
+    ## https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/MMPROD/departments?companyCode=IKF&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null
+
+    
+
+    
+

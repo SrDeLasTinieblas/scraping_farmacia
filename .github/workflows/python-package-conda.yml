@@ -1,0 +1,27 @@
+name: Python Package using Conda
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Excecuting
+      run: |
+          pip install pipreqs
+          pipreqs .
+          ls -lah
+          cat requirements.txt
+          pip install -r requirements.txt
+          cd backend/scrapy/
+          python __init__.py       
+        
+    
