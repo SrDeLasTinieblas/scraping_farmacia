@@ -12,7 +12,7 @@ import os
 # Obtener la cadena de conexión de la variable de entorno
 conn_str = os.environ.get('SQL_SERVER_CONNECTION_STRING')
 
-print(conn_str)
+print("conn_str: ", conn_str)
 
 def download_product(page, product_url):
     tag = page.title 
