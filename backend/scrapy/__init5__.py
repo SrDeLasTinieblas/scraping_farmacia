@@ -9,26 +9,37 @@ from utils.NetUtils import download_page, get_random_user_agent
 import concurrent.futures
 
 
-
 def download_product(page, product_url):
     tag = page.title 
-    print(f"{tag} >>> Descargando product ", product_url)
+    print(f"{tag} >>> Descargando producto ", product_url)
     return product_url, page.get_product(product_url)
 
-
-def download_page_main(page):     
-    tag = page.title 
+def download_page_main(page):
+    tag = page.title
     
     inicio = time.time()
 
     final_products_url = []
     products_black_list = []
     categories_black_list = []
+    
+    categorias_total = []
+    productos_total = []
+    
+    categorias, lista_categoria_id = page.collect_categories()
 
-    categories = page.get_categories()
-
-    for category_url in categories:               
-        product_urls_internal = page.get_product_urls(category_url)  
+    print("categorias: ", categorias)
+    print("lista de categorias id: ", lista_categoria_id)
+    
+    #for categoria in categorias:               
+    product_urls_internal = page.get_product_urls("cuidado-capilar-2")
+    productos_total.append(product_urls_internal)
+        
+    #print(len(productos_total))
+        #for producto in categorias_total:
+         #   print(len(productos_total))
+'''
+        print(category_url)
         if product_urls_internal:
            
            for product_url in product_urls_internal:
@@ -39,6 +50,22 @@ def download_page_main(page):
        
         products_url_internal_size = len(product_urls_internal)
         print(f"{tag} >>> Cantidad de Products en Categoria :: {category_url} -> Tamaño :: {products_url_internal_size}")
+
+    
+    for category_url in categories:               
+        product_urls_internal = page.get_product_urls(lista_categoria_id)  
+        if product_urls_internal:
+           
+           for product_url in product_urls_internal:
+               final_products_url.append(product_url) 
+            
+        else :
+            categories_black_list.append(category_url)
+       
+        products_url_internal_size = len(product_urls_internal)
+        print(f"{tag} >>> Cantidad de Products en Categoria :: {category_url} -> Tamaño :: {products_url_internal_size}")
+
+    
 
 
 
@@ -62,12 +89,10 @@ def download_page_main(page):
             for product_url in product_urls:
                 final_products_url.append(product_url)                  
             
-
-
     print(f"{tag} >>> Descargando Productos ....")
 
     unique_products_url = list(set(final_products_url))
-    unique_products_url = unique_products_url[:10] # --FOR ACTION
+    #unique_products_url = unique_products_url[:10] # --FOR ACTION
 
     threaded_start = time.time()
     products = []
@@ -114,29 +139,16 @@ def download_page_main(page):
         print("Suggested Comment : ", product.suggested_comment)
         print("-" * 20)
         print("\n")
+    '''
+    
+    
 
 ## Call main
-
-boticas_peru = BoticasPeru()
-download_page_main(boticas_peru)
-
-boticasSalud = BoticasSalud()
-download_page_main(boticasSalud)
-
-boticasHogarSalud = BoticasHogarSalud()
-download_page_main(boticasHogarSalud)
-
-#boticasFarmaUniversal = BoticasFarmaUniversal()
-#download_page_main(boticasFarmaUniversal)
-
-
-
-#mifarma = Mifarma()
-#download_page_main(mifarma)
+mifarma = Mifarma()
+download_page_main(mifarma)
 
 #print("Tamaño: ", len(mifarma.get_product_urls()))
 
-#download_page_main(mifarma)
 
 
 
