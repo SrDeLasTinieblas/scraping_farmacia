@@ -6,7 +6,7 @@ from pages.BoticasHogarSalud import BoticasHogarSalud
 from pages.BoticasFarmaUniversal import BoticasFarmaUniversal
 from pages.Mifarma import Mifarma
 import concurrent.futures
-#import pyodbc
+import pyodbc
 import os
 
 # Obtener la cadena de conexión de la variable de entorno
@@ -113,18 +113,18 @@ if __name__ == '__main__':
     conn = os.environ.get.connect(conn_str)
 
     # Crea un cursor
-    cursor = os.environ.get.cursor()
+    cursor = conn.cursor()
 
     insert_query = """
     INSERT INTO productos (productos)
     VALUES (?)
     """
     cursor.execute(insert_query, concatenated_data)
-    os.environ.get.commit()
+    conn.commit()
         
     # Cierra el cursor y la conexión
     cursor.close()
-    os.environ.get.close()
+    conn.close()
 
 
 
