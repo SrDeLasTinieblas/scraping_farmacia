@@ -95,8 +95,6 @@ def concatenate_products(products):
     concatenated_data = "¬".join("|".join(str(getattr(product, attribute)) for attribute in ["name", "presentation", "brand", "price_box", "price_blister", "source_information", "lifting_date", "laboratory", "card_discount", "crossed_price", "suggested_comment"]) for product in products)
     return concatenated_data
 
-
-
 if __name__ == '__main__':
     boticas_peru = BoticasPeru()
     boticas_salud = BoticasSalud()

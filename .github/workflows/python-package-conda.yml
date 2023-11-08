@@ -21,12 +21,15 @@ jobs:
             ls -lah
             cat requirements.txt
             pip install -r requirements.txt
-              
+    - name: List ODBC Drivers
+      run: odbcinst -q -d
+
     - name: Ejecutando Scraping y subiendolo a la Base de datos
       run: |
             cd backend/scrapy/
             python __initTest__.py
       env:
         SQL_SERVER_CONNECTION_STRING: ${{ secrets.SQL_SERVER_CONNECTION_STRING }}
+
 
         #'DRIVER={{SQL Server}};SERVER={tinieblaserver.database.windows.net};DATABASE={testEmpresa};UID={FacturacionInventario};PWD={Darkangelo2023}'
