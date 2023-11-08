@@ -113,18 +113,18 @@ if __name__ == '__main__':
     conn = os.environ.get.connect(conn_str)
 
     # Crea un cursor
-    cursor = conn.cursor()
+    cursor = os.environ.get.cursor()
 
     insert_query = """
     INSERT INTO productos (productos)
     VALUES (?)
     """
     cursor.execute(insert_query, concatenated_data)
-    conn.commit()
+    os.environ.get.commit()
         
     # Cierra el cursor y la conexión
     cursor.close()
-    conn.close()
+    os.environ.get.close()
 
 
 
