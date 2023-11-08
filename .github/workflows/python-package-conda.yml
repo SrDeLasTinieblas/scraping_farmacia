@@ -14,14 +14,15 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.10'
-    - name: Excecuting
+    - name: Instalando los paquetes
       run: |
-          pip install pipreqs
-          pipreqs .
-          ls -lah
-          cat requirements.txt
-          pip install -r requirements.txt
-          cd backend/scrapy/
-          python __init__.py       
-        
-    
+            pip install pipreqs
+            pipreqs .
+            ls -lah
+            cat requirements.txt
+            pip install -r requirements.txt
+              
+    - name: Ejecutando Scraping y subiendolo a la Base de datos
+      run: |
+            cd backend/scrapy/
+            python __initTest__.py
