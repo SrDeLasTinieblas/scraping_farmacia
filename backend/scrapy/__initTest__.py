@@ -110,7 +110,7 @@ if __name__ == '__main__':
     #print(concatenated_data)
     
     # Establece la conexión
-    conn = os.environ.get.connect(conn_str)
+    conn = pyodbc.connect(conn_str)
 
     # Crea un cursor
     cursor = conn.cursor()
