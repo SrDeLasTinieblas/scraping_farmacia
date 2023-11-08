@@ -9,10 +9,7 @@ import concurrent.futures
 import pyodbc
 import os
 
-# Obtener la cadena de conexión de la variable de entorno
-conn_str = os.environ.get('SQL_SERVER_CONNECTION_STRING')
 
-print("conn_str: ", conn_str)
 
 def download_product(page, product_url):
     tag = page.title 
@@ -98,6 +95,7 @@ def concatenate_products(products):
     return concatenated_data
 
 if __name__ == '__main__':
+    
     boticas_peru = BoticasPeru()
     boticas_salud = BoticasSalud()
     boticas_hogar_salud = BoticasHogarSalud()
@@ -111,6 +109,10 @@ if __name__ == '__main__':
     # Imprimir o guardar la variable concatenated_data según tus necesidades
     #print(concatenated_data)
     
+    # Obtener la cadena de conexión de la variable de entorno
+    conn_str = os.environ.get('SQL_SERVER_CONNECTION_STRING')
+
+    print("conn_str: ", conn_str)
     # Establece la conexión
     conn = pyodbc.connect(conn_str)
 
