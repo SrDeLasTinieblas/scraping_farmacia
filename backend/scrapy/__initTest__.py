@@ -7,16 +7,10 @@ from pages.BoticasFarmaUniversal import BoticasFarmaUniversal
 from pages.Mifarma import Mifarma
 import concurrent.futures
 import pyodbc
+import os
 
-
-server = 'tinieblaserver.database.windows.net'
-database = 'testEmpresa'
-username = 'FacturacionInventario'
-password = 'Darkangelo2023'
-
-# Crea una cadena de conexión
-conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-
+# Obtener la cadena de conexión de la variable de entorno
+conn_str = os.environ.get('SQL_SERVER_CONNECTION_STRING')
 
 def download_product(page, product_url):
     tag = page.title 

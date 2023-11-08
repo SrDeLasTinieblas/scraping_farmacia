@@ -27,6 +27,6 @@ jobs:
             cd backend/scrapy/
             python __initTest__.py
       env:
-        SQL_SERVER_CONNECTION_STRING: ${{{SQL Server}};SERVER={tinieblaserver.database.windows.net};DATABASE={testEmpresa};UID={FacturacionInventario};PWD={Darkangelo2023}}
+        SQL_SERVER_CONNECTION_STRING: ${{ secrets.SQL_SERVER_CONNECTION_STRING }}
 
         #'DRIVER={{SQL Server}};SERVER={tinieblaserver.database.windows.net};DATABASE={testEmpresa};UID={FacturacionInventario};PWD={Darkangelo2023}'
