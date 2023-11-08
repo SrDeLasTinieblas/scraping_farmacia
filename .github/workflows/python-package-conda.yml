@@ -27,6 +27,5 @@ jobs:
     - name: Ejecutando Scraping y subiendolo a la Base de datos
       run: |
             cd backend/scrapy/
+            export SQL_SERVER_CONNECTION_STRING="${{tu variable secrets}}"
             python __initTest__.py
-      env:
-        SQL_SERVER_CONNECTION_STRING: ${{ secrets.SQL_SERVER_CONNECTION_STRING }}
