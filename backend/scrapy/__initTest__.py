@@ -6,7 +6,7 @@ from pages.BoticasHogarSalud import BoticasHogarSalud
 from pages.BoticasFarmaUniversal import BoticasFarmaUniversal
 from pages.Mifarma import Mifarma
 import concurrent.futures
-import pyodbc
+#import pyodbc
 import os
 
 # Obtener la cadena de conexión de la variable de entorno
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     #print(concatenated_data)
     
     # Establece la conexión
-    conn = pyodbc.connect(conn_str)
+    conn = os.environ.get.connect(conn_str)
 
     # Crea un cursor
     cursor = conn.cursor()
