@@ -28,7 +28,7 @@ for product_slug in products_slug[:10]:
 concatenated_data = concatenate_products(products)
 
 # Imprime la cadena concatenada
-print(concatenated_data)
+print("3¯", concatenated_data)
 
 
 # Concatena y muestra la información de los productos

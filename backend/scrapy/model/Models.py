@@ -1,7 +1,6 @@
 
 class Product:
-        def __init__(self, id_botica, id_sku, name, presentation, brand, price_box, price_blister, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment):
-            self.id_botica = id_botica
+        def __init__(self, id_sku, name, presentation, brand, price_box, price_blister, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment):
             self.id_sku = id_sku
             self.name = name
             self.presentation = presentation
@@ -36,7 +35,7 @@ class Product:
         
         def show_information(self):
             # Convierte el objeto Product a una cadena en el formato deseado
-            return f"{self.id_botica}¯{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price_box}|{self.price_blister}|{self.source_information}|{self.lifting_date}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}"
+            return f"{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price_box}|{self.price_blister}|{self.source_information}|{self.lifting_date}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}"
 
 
         

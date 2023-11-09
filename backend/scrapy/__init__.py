@@ -9,8 +9,6 @@ from pages.BoticasInkafarma import BoticasInkafarma
 from utils.NetUtils import download_page, get_random_user_agent
 import concurrent.futures
 
-
-
 def download_product(page, product_url):
     tag = page.title 
     print(f"{tag} >>> Descargando producto ", product_url)
@@ -91,11 +89,9 @@ def download_page_main(page):
     return products
 
 def concatenate_products(products):
-    concatenated_data = "¬".join("|".join(str(getattr(product, attribute)) for attribute in 
-                                          ["id_botica", "id_sku","name", "presentation", "brand", "price_box", "price_blister", 
-                                           "source_information", "lifting_date", "laboratory", "card_discount", 
-                                           "crossed_price", "suggested_comment"]) for product in products)
+    concatenated_data = "¬".join(product.show_information() for product in products)
     return concatenated_data
+
 
 
 '''
@@ -137,11 +133,11 @@ boticas_salud = BoticasSalud()
 products_salud = download_page_main(boticas_salud)
 '''
 
-#boticas_peru = BoticasPeru()
-#products_peru = download_page_main(boticas_peru)
+boticas_peru = BoticasPeru()
+products_peru = download_page_main(boticas_peru)
 
-boticasHogarSalud = BoticasHogarSalud()
-productosHogarSalud = download_page_main(boticasHogarSalud)
+#boticasHogarSalud = BoticasHogarSalud()
+#productosHogarSalud = download_page_main(boticasHogarSalud)
 
 #print(boticasHogarSalud.get_all_products_in_category("https://www.boticasysalud.com/tienda/catalogo/vitaminasysuplementos"))
 
@@ -160,10 +156,10 @@ products_inkafarma = download_page_main(boticas_inkafarma)
 '''
 
 
-concatenated_data = concatenate_products(productosHogarSalud)
+concatenated_data = concatenate_products(products_peru)
 #
 
-#print(concatenated_data)
+print(concatenated_data)
 
 
 

@@ -116,7 +116,6 @@ class BoticasSalud(Page):
                  crossed_price = prices_box[0]
                  
             product = Product(
-                id_botica=3,
                 id_sku=sku_id if sku_id else None,
                 name=title if title else None,
                 presentation=" / ".join(presentation_titles) if presentation_titles else None,

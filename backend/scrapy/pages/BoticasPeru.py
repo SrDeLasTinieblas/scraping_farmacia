@@ -128,6 +128,18 @@ class BoticasPeru(Page):
                 if "Magento_Catalog/js/product/view/provider" in script_content:
                     target_json = data["*"]["Magento_Catalog/js/product/view/provider"]
                     break
+                
+            # Busca elementos con la clase "old-price"
+            old_price_elements = soup.find_all(class_='price-box price-final_price')
+
+            # Itera a través de los elementos encontrados
+            for element in old_price_elements:
+                # Dentro de cada elemento "old-price", busca el precio con la clase "price"
+                price_element = element.find(class_='old-price')
+                # Si se encontró un precio, imprímelo
+                if price_element:
+                    price_text = price_element.text.strip()
+                    print(price_text)
 
             if target_json:
                 first_item = list(target_json["data"]["items"].values())[0]
@@ -151,7 +163,7 @@ class BoticasPeru(Page):
                     lifting_date =  None,
                     laboratory =  laboratorio if laboratorio else None,
                     card_discount =  None,
-                    crossed_price =  None,
+                    crossed_price =  price_text if price_text else None,
                     suggested_comment =  None
                 )
                 
