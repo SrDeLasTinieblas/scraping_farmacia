@@ -48,37 +48,29 @@ class BoticasSalud(Page):
         
         url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct/getbyparameters?FilterValue={product_slug}&FilterBy=2"
         response_data = download_json(url)
+        #url_web = f"https://www.boticasysalud.com/tienda/productos/{product_slug}"
+        #response_data_web = download_page(url_web)
         
         if not response_data:
             print(f"{self.title} : Hubo un error al descargar el producto = {product_slug}")
             return None
         
-        try:    
-            #url_pagina_producto = f"https://www.boticasysalud.com/tienda/productos/{product_slug}" #59982-pastadentalcolgatesmilesjusticeleague75ml
-
-            #html = download_page(url_pagina_producto)
-            #if not html:
-             #   print(f"{self.title} : Hubo un error al descargar el producto = {url_pagina_producto}")
-              #  return None
-            
-            #soup = BeautifulSoup(html, 'html.parser')
-        
-            #title_text = soup.find('h1', class_='page-title').text.strip()
-            
-            #sku_div = soup.find('div', class_='product__rating-legend')
-            #sku_text = sku_div.text.strip()
-            #print("soup: ", soup)
+        try:
             
             titulos = []
             
-            item = response_data["data"] 
+            item = response_data["data"]
+            categoria = item["categories"][0]
+            titulo_categoria = categoria["title"]
+            
             title = item["title"]
             
-            discounted_price = item["discountedPrice"]
+            #discounted_price = item["discountedPrice"]
             #presentations = item["presentations"][0]
             presentations = item["presentations"]
+            discounted_price = response_data["data"]["presentations"][0]["discountedPrice"]
             #titulos = presentations["title"]
-            #print(presentations[0])
+            #print(discounted_price)
             
             for presentation in presentations:
                 titulo = presentation["title"]  # Obtiene el título de la presentación actual
@@ -90,23 +82,28 @@ class BoticasSalud(Page):
             # Inicializa un array para almacenar los precios
             precios = []
 
-# Inicializa listas para almacenar las presentaciones y precios
+            # Inicializa listas para almacenar las presentaciones y precios
             presentation_titles = []
             prices_blister = []
             prices_box = []
 
             # Itera a través de las presentaciones y extrae los precios
             for presentation in item["presentations"]:
-                #title = presentation["title"]
+                title_presentacion = presentation["title"]
                 precio = presentation["price"]
-                presentation_title = f"{title} x {presentation['fractions']} {presentation['description']}"
+                presentation_title = f"{title_presentacion} x {presentation['fractions']} {presentation['description']}"
                 presentation_titles.append(presentation_title)
                 precios.append(precio)
 
-                if title == "Blister":
+                if title_presentacion == "Blister":
                     prices_blister.append(precio)
-                elif title == "Caja":
+                elif title_presentacion == "Caja":
                     prices_box.append(precio)
+                else:
+                    # Si no es "Blister" ni "Caja," asumir que es una caja
+                    prices_box.append(precio)
+
+            #print("precio: ", precio)
 
             product_brand = item["productBrand"]
             brand = product_brand["title"]
@@ -114,6 +111,10 @@ class BoticasSalud(Page):
 
             laboratorio = next((details["description"] for details in item["details"] if details["name"] == "Laboratorio"), None)
 
+            crossed_price = 0
+            if discounted_price > 0:
+                 crossed_price = prices_box[0]
+                 
             product = Product(
                 id_botica=3,
                 id_sku=sku_id if sku_id else None,
@@ -125,10 +126,11 @@ class BoticasSalud(Page):
                 source_information=self.title if self.title else None,
                 lifting_date=None,
                 laboratory=laboratorio if laboratorio else None,
-                card_discount=f"S/{discounted_price:.2f}",
-                crossed_price=None,
+                card_discount=f"{discounted_price:.2f}" if discounted_price else None,
+                crossed_price=crossed_price,
                 suggested_comment=None
             )
+
 
 
         except Exception as e:
