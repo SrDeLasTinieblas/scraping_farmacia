@@ -23,7 +23,7 @@ def download_page_main(page):
     categories_black_list = []
 
     categories = page.get_categories()
-    categories = categories[:1]  # Limitar a una categoría (para pruebas)
+    #categories = categories[:1]  # Limitar a una categoría (para pruebas)
 
     for category_url in categories:               
         product_urls_internal = page.get_product_urls(category_url)  
@@ -57,7 +57,7 @@ def download_page_main(page):
     print(f"{tag} >>> Descargando Productos ....")
 
     unique_products_url = list(set(final_products_url))
-    unique_products_url = unique_products_url[:5]  # Limitar para pruebas
+    #unique_products_url = unique_products_url[:5]  # Limitar para pruebas
 
     threaded_start = time.time()
     products = []
@@ -129,9 +129,8 @@ concatenated_data = concatenate_products(products_peru + products_salud)
 
 
 print(concatenated_data)
-
-
-
+archivo=open("datos.txt","w") 
+archivo.write(concatenated_data) 
 
 
 

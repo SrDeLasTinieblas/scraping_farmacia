@@ -28,5 +28,4 @@ jobs:
           if [[ $commit_message == *"action"* ]]; then
 
             cd backend/scrapy/
-            export SQL_SERVER_CONNECTION_STRING="${{secrets.SQL_SERVER_CONNECTION_STRING}}"
             python __init__.py
