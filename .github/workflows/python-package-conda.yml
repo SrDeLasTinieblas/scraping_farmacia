@@ -24,8 +24,5 @@ jobs:
 
     - name: Check Commit Message and Execute
       run: |
-          commit_message=$(git log -1 --pretty=%B)
-          if [[ $commit_message == *"action"* ]]; then
-
             cd backend/scrapy/
             python __init__.py
