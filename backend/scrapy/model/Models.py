@@ -15,8 +15,8 @@ class Product:
             self.crossed_price = crossed_price
             self.suggested_comment = suggested_comment
             
+            '''
         def show_information(self):
-                
                 print("Product Information:")
                 print(f"\tid_botica: {self.id_botica}")
                 print(f"\tSKU: {self.id_sku}")
@@ -32,8 +32,12 @@ class Product:
                 print(f"\tCrossed Price: {self.crossed_price}")
                 print(f"\tSuggested Comment: {self.suggested_comment}")
                 print("-" * 20)
+        '''
         
-        
+        def show_information(self):
+            # Convierte el objeto Product a una cadena en el formato deseado
+            return f"{self.id_botica}¯{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price_box}|{self.price_blister}|{self.source_information}|{self.lifting_date}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}"
+
 
         
         
