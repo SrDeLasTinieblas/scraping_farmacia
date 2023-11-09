@@ -6,3 +6,4 @@ class BoticasMiFarma(BaseResponseFarma):
           
     def __init__(self, title = "Mi farma", url = "https://www.mifarma.com.pe"):
         super().__init__(title, url)
+

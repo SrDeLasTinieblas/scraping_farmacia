@@ -18,15 +18,19 @@ categoriesSalud = categoriesSalud[:1]
 #print(categoriesSalud)
 #print("\n")
 
+
+
 for category_slug in categoriesSalud:
     products_slug = boticas_salud.get_product_urls(category_slug)
-    for product_slug in products_slug[:10]:
+    for product_slug in products_slug[:5]:
         product = boticas_salud.get_product(product_slug)
         product.show_information()
-        print("\n\n")
-    
+        print("\n")
 
-#print("Categories Salud")
+
+#product = boticas_salud.get_product("panadol-antigripal-nf-tableta")
+#product.show_information()
+#print("Categories Salud")30629-panadoladultosefervescente
 #print(categoriesSalud)
 
 #categories = categories[:2] #  --

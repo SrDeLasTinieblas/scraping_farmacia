@@ -4,7 +4,6 @@ from pages.BoticasSalud import BoticasSalud
 from pages.BoticasHogarSalud import BoticasHogarSalud
 
 
-
 boticas = [
     BoticasSalud("Boticas y Salud", "https://www.boticasysalud.com"),
     BoticasPeru("Boticas Peru", "https://boticasperu.pe"), 

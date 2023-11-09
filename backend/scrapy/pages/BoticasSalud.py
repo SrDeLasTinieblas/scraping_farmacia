@@ -54,19 +54,51 @@ class BoticasSalud(Page):
             return None
         
         try:    
+            #url_pagina_producto = f"https://www.boticasysalud.com/tienda/productos/{product_slug}" #59982-pastadentalcolgatesmilesjusticeleague75ml
 
+            #html = download_page(url_pagina_producto)
+            #if not html:
+             #   print(f"{self.title} : Hubo un error al descargar el producto = {url_pagina_producto}")
+              #  return None
+            
+            #soup = BeautifulSoup(html, 'html.parser')
+        
+            #title_text = soup.find('h1', class_='page-title').text.strip()
+            
+            #sku_div = soup.find('div', class_='product__rating-legend')
+            #sku_text = sku_div.text.strip()
+            #print("soup: ", soup)
+            
+            titulos = []
+            
             item = response_data["data"] 
             title = item["title"]
-            discounted_price = item["discountedPrice"]
-            dispresentation = item["presentations"][0]
             
-            title_presentation = dispresentation["title"]
-            description = dispresentation["description"]
-            normal_price = dispresentation["price"]
-            presentation = title_presentation + description
+            discounted_price = item["discountedPrice"]
+            #presentations = item["presentations"][0]
+            presentations = item["presentations"]
+            #titulos = presentations["title"]
+            #print(presentations[0])
+            
+            for presentation in presentations:
+                titulo = presentation["title"]  # Obtiene el título de la presentación actual
+                titulos.append(titulo)  # Agrega el título a la lista de títulos
+
+            # Ahora, la lista "titulos" contendrá todos los títulos de las presentaciones
+            #print(titulos)
+            presentation_titles = " / ".join(titulos)
+            #for presentation in presentations:
+                #title_presentation = presentations["title"]
+                
+             #   titulos.append(presentation["title"])
+                #description = presentations["description"]
+                #normal_price = presentations["price"]
+            
             product_brand = item["productBrand"]
             brand = product_brand["title"]
-            
+            sku_id= item["skuIdClient"]
+
+            #print(titulos)
             # laboratorio = None   
             #for details in item["details"]:
             #    if details["name"] == "Laboratorio":
@@ -78,11 +110,12 @@ class BoticasSalud(Page):
                 #print(laboratorio)
             
             product = Product(
+                id_sku = sku_id,
                 name = title,
-                presentation= title_presentation,
+                presentation = presentation_titles,
                 brand = brand,
                 price_box= None,
-                price_blister = f"S/{normal_price:.2f}",
+                price_blister = None, #f"S/{normal_price:.2f}"
                 source_information = self.title,
                 lifting_date = None,
                 laboratory = laboratorio,

@@ -42,8 +42,10 @@ categories_hogar_salud = categories_hogar_salud[:1]
 
 for category_url in categories_hogar_salud:
     products_url = boticas_hogar_salud.get_product_urls(category_url)
-    
-    print(products_url)
+    for product_url in products_url:
+        product = boticas_hogar_salud.get_product(product_url)
+        product.show_information()
+    #print(products_url)
 
 
 #categories = categories[:2] #  --

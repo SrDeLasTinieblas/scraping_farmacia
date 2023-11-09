@@ -28,11 +28,11 @@ def download_page_main(page):
     
     categorias, lista_categoria_id = page.collect_categories()
 
-    print("categorias: ", categorias)
-    print("lista de categorias id: ", lista_categoria_id)
+    #print("categorias: ", categorias)
+    #print("lista de categorias id: ", lista_categoria_id)
     
     #for categoria in categorias:               
-    product_urls_internal = page.get_product_urls("cuidado-capilar-2")
+    product_urls_internal = page.get_product_urls("farmacia-1")
     productos_total.append(product_urls_internal)
         
     #print(len(productos_total))
@@ -144,11 +144,29 @@ def download_page_main(page):
     
 
 ## Call main
-mifarma = Mifarma()
-download_page_main(mifarma)
+#mifarma = BoticasMiFarma()
+#download_page_main(mifarma)
+
+botica_mi_farma = BoticasMiFarma()
+categories_id = botica_mi_farma.get_categories()
+#print("categories",categories_id)
+
+#categories_id = categories_id[:1] # -- For action
+
+for category_id in categories_id:
+    products = botica_mi_farma.get_product_urls(category_id)
+    #print("products",f"category {category_id}",products)
+    #print("products", products)
+    for product in products:
+        #random_product_id = random.choice(products)
+        product = botica_mi_farma.get_product(product)
+        product.show_information()
+
+# name : Pack 02 Magnesol en Polvo + 02 Magnesol Efervescentes Limón + 02 Magnesol Efervescentes Naranja
+
+
 
 #print("Tamaño: ", len(mifarma.get_product_urls()))
-
 
 
 

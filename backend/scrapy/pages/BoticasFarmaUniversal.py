@@ -2,7 +2,6 @@ from model.Models import Product
 from pages.base.base import Page
 from bs4 import BeautifulSoup
 from utils.NetUtils import download_json, download_page
-
 import re
 
 class BoticasFarmaUniversal(Page):
@@ -40,6 +39,11 @@ class BoticasFarmaUniversal(Page):
             print(f"{self.title} : Hubo un error, category id no encontrado = {category_url}")
             return None
         
+        """
+        payload is  orden=  &   idcate=4    &   idsubcate=0     &offset=32  &scroll=true
+        response is offset = 48     tot_result = 16        
+    
+        """
         there_are_more_pages = True   
         last_total_result = 0    
        

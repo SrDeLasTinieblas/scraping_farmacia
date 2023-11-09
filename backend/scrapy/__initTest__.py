@@ -4,11 +4,17 @@ from pages.BoticasPeru import BoticasPeru
 from pages.BoticasSalud import BoticasSalud
 from pages.BoticasHogarSalud import BoticasHogarSalud
 from pages.BoticasFarmaUniversal import BoticasFarmaUniversal
-from pages.Mifarma import Mifarma
 import concurrent.futures
 import pyodbc
-import os
 
+
+server = 'tinieblaserver.database.windows.net'
+database = 'testEmpresa'
+username = 'FacturacionInventario'
+password = 'Darkangelo2023'
+
+# Crea una cadena de conexión
+conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
 
 
 def download_product(page, product_url):
@@ -26,14 +32,14 @@ def download_page_main(page):
 
     categories = page.get_categories()
     categories = categories[:1]  # Limitar a una categoría (para pruebas)
-    
+
     for category_url in categories:               
         product_urls_internal = page.get_product_urls(category_url)  
         if product_urls_internal:
             final_products_url.extend(product_urls_internal) 
         else:
             categories_black_list.append(category_url)
-       
+
         products_url_internal_size = len(product_urls_internal)
         print(f"{tag} >>> Cantidad de Productos en Categoría :: {category_url} -> Tamaño :: {products_url_internal_size}")
 
@@ -49,11 +55,11 @@ def download_page_main(page):
         for category_black in categories_black_list:
             print(f"{tag} >>> Descargando Black Category : {category_black}")
             product_urls = page.get_product_urls(category_black)
-            
+
             if not product_urls:
                 print(f"{tag} >>> Productos no descargados de la black category {category_black}")
                 continue
-                        
+
             final_products_url.extend(product_urls)
 
     print(f"{tag} >>> Descargando Productos ....")
@@ -94,8 +100,9 @@ def concatenate_products(products):
     concatenated_data = "¬".join("|".join(str(getattr(product, attribute)) for attribute in ["name", "presentation", "brand", "price_box", "price_blister", "source_information", "lifting_date", "laboratory", "card_discount", "crossed_price", "suggested_comment"]) for product in products)
     return concatenated_data
 
+
+
 if __name__ == '__main__':
-    
     boticas_peru = BoticasPeru()
     boticas_salud = BoticasSalud()
     boticas_hogar_salud = BoticasHogarSalud()
@@ -107,30 +114,21 @@ if __name__ == '__main__':
     concatenated_data = concatenate_products(products_peru + products_salud + products_hogar_salud)
 
     # Imprimir o guardar la variable concatenated_data según tus necesidades
-    #print(concatenated_data)
-    
-    # Obtener la cadena de conexión de la variable de entorno
-    conn_str = os.environ.get('SQL_SERVER_CONNECTION_STRING')
+    print(concatenated_data)
 
-    print("conn_str: ", conn_str)
     # Establece la conexión
-    conn = pyodbc.connect(conn_str)
+    #conn = pyodbc.connect(conn_str)
 
     # Crea un cursor
-    cursor = conn.cursor()
+    #cursor = conn.cursor()
 
     insert_query = """
     INSERT INTO productos (productos)
     VALUES (?)
     """
-    cursor.execute(insert_query, concatenated_data)
-    conn.commit()
-        
+    #cursor.execute(insert_query, concatenated_data)
+    #conn.commit()
+
     # Cierra el cursor y la conexión
-    cursor.close()
-    conn.close()
-
-
-
-
-
+    #cursor.close()
+    #conn.close()

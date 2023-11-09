@@ -29,20 +29,14 @@ class BoticasPeru(Page):
     
     
     def get_product_urls(self, category_url):
-        
-
         products_url = []
-        
-        
-        # Ejemplo de category_url
-        # https://boticasperu.pe/promociones.html
         conter = 0
         is_equals = True
         lastest_product_urls_hash = None
                 
         while is_equals:
             conter += 1
-            # https://boticasperu.pe/promociones.html?p=1
+            
             final_category_url =  f"{category_url}?p={conter}"
             print(f"Pag :: {final_category_url}")
             products_url_internal = []
@@ -85,7 +79,6 @@ class BoticasPeru(Page):
             else:
                 lastest_product_urls_hash = hash_tuple         
         
-           
         return products_url    
               
                        
@@ -101,6 +94,10 @@ class BoticasPeru(Page):
             soup = BeautifulSoup(html, 'html.parser')
         
             title_text = soup.find('h1', class_='page-title').text.strip()
+            
+            sku_div = soup.find('div', class_='product attribute sku')
+            strong_element = sku_div.find('div', class_='value')
+            sku_text = strong_element.text.strip()
             
             product_info = {}  # Crear un diccionario para almacenar la información
             
@@ -138,20 +135,22 @@ class BoticasPeru(Page):
                 name = nombre[0]["label"]
 
                 prices_info = first_item.get("price_info")
-                final_price = prices_info["final_price"]
+                #final_price = prices_info["final_price"]
                 regular_price = prices_info["regular_price"]
                 
+                
                 product = Product(
+                    id_sku = sku_text,
                     name =  name,
                     presentation =  None,
                     brand =  None,
-                    price_box =  f"S/{final_price:.2f}",
-                    price_blister =  f"S/{regular_price:.2f}",
+                    price_box =  f"S/{regular_price:.2f}",
+                    price_blister =  None,
                     source_information = self.title,
                     lifting_date =  None,
                     laboratory =  laboratorio,
                     card_discount =  None,
-                    crossed_price =  f"S/{regular_price:.2f}",
+                    crossed_price =  None,
                     suggested_comment =  None
                 )
                 
