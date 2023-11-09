@@ -116,8 +116,8 @@ def concatenate_products(products):
 
 ## Call main
 
-#boticas_peru = BoticasPeru()
-#products_peru = download_page_main(boticas_peru)
+boticas_peru = BoticasPeru()
+products_peru = download_page_main(boticas_peru)
 
 boticas_salud = BoticasSalud()
 products_salud = download_page_main(boticas_salud)
@@ -125,7 +125,7 @@ products_salud = download_page_main(boticas_salud)
 #BoticasHogarSalud = BoticasHogarSalud()
 #productosHogarSalud = download_page_main(BoticasHogarSalud)
 
-concatenated_data = concatenate_products(products_salud)
+concatenated_data = concatenate_products(products_peru + products_salud)
 
 
 print(concatenated_data)

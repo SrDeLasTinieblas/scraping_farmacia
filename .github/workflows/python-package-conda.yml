@@ -21,11 +21,12 @@ jobs:
             ls -lah
             cat requirements.txt
             pip install -r requirements.txt
-    - name: List ODBC Drivers
-      run: odbcinst -q -d
 
-    - name: Ejecutando Scraping y subiendolo a la Base de datos
+    - name: Check Commit Message and Execute
       run: |
+          commit_message=$(git log -1 --pretty=%B)
+          if [[ $commit_message == *"action"* ]]; then
+
             cd backend/scrapy/
             export SQL_SERVER_CONNECTION_STRING="${{secrets.SQL_SERVER_CONNECTION_STRING}}"
-            python __initTest__.py
+            python __init__.py
