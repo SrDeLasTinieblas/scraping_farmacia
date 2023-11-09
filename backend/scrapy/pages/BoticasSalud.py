@@ -87,43 +87,50 @@ class BoticasSalud(Page):
             # Ahora, la lista "titulos" contendrá todos los títulos de las presentaciones
             #print(titulos)
             presentation_titles = " / ".join(titulos)
-            #for presentation in presentations:
-                #title_presentation = presentations["title"]
-                
-             #   titulos.append(presentation["title"])
-                #description = presentations["description"]
-                #normal_price = presentations["price"]
-            
+            # Inicializa un array para almacenar los precios
+            precios = []
+
+# Inicializa listas para almacenar las presentaciones y precios
+            presentation_titles = []
+            prices_blister = []
+            prices_box = []
+
+            # Itera a través de las presentaciones y extrae los precios
+            for presentation in item["presentations"]:
+                #title = presentation["title"]
+                precio = presentation["price"]
+                presentation_title = f"{title} x {presentation['fractions']} {presentation['description']}"
+                presentation_titles.append(presentation_title)
+                precios.append(precio)
+
+                if title == "Blister":
+                    prices_blister.append(precio)
+                elif title == "Caja":
+                    prices_box.append(precio)
+
             product_brand = item["productBrand"]
             brand = product_brand["title"]
-            sku_id= item["skuIdClient"]
+            sku_id = item["skuIdClient"]
 
-            #print(titulos)
-            # laboratorio = None   
-            #for details in item["details"]:
-            #    if details["name"] == "Laboratorio":
-            #       laboratorio = details["description"]
-                
             laboratorio = next((details["description"] for details in item["details"] if details["name"] == "Laboratorio"), None)
 
-            #if laboratorio is not None:
-                #print(laboratorio)
-            
             product = Product(
-                id_botica = 3,
-                id_sku = sku_id if sku_id else None,
-                name = title if title else None,
-                presentation = presentation_titles if presentation_titles else None,
-                brand = brand,
-                price_box= None,
-                price_blister = None, #f"S/{normal_price:.2f}"
-                source_information = self.title if self.title else None,
-                lifting_date = None,
-                laboratory = laboratorio if laboratorio else None,
-                card_discount = f"S/{discounted_price:.2f}",
-                crossed_price = None,
-                suggested_comment = None
+                id_botica=3,
+                id_sku=sku_id if sku_id else None,
+                name=title if title else None,
+                presentation=" / ".join(presentation_titles) if presentation_titles else None,
+                brand=brand,
+                price_box=f"{prices_box[0]:.2f}" if prices_box else None,
+                price_blister=f"{prices_blister[0]:.2f}" if prices_blister else None,
+                source_information=self.title if self.title else None,
+                lifting_date=None,
+                laboratory=laboratorio if laboratorio else None,
+                card_discount=f"S/{discounted_price:.2f}",
+                crossed_price=None,
+                suggested_comment=None
             )
+
+
         except Exception as e:
             print(f"{self.title} : Hubo un error al extraer datos en {product_slug} -> {str(e)}")          
             

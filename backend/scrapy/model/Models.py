@@ -18,7 +18,7 @@ class Product:
         def show_information(self):
                 
                 print("Product Information:")
-                print(f"\tSKU: {self.id_botica}")
+                print(f"\tid_botica: {self.id_botica}")
                 print(f"\tSKU: {self.id_sku}")
                 print(f"\tName: {self.name}")
                 print(f"\tPresentation: {self.presentation}")
