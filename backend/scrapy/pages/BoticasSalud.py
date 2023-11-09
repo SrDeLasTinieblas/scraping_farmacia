@@ -110,15 +110,16 @@ class BoticasSalud(Page):
                 #print(laboratorio)
             
             product = Product(
-                id_sku = sku_id,
-                name = title,
-                presentation = presentation_titles,
+                id_botica = 3,
+                id_sku = sku_id if sku_id else None,
+                name = title if title else None,
+                presentation = presentation_titles if presentation_titles else None,
                 brand = brand,
                 price_box= None,
                 price_blister = None, #f"S/{normal_price:.2f}"
-                source_information = self.title,
+                source_information = self.title if self.title else None,
                 lifting_date = None,
-                laboratory = laboratorio,
+                laboratory = laboratorio if laboratorio else None,
                 card_discount = f"S/{discounted_price:.2f}",
                 crossed_price = None,
                 suggested_comment = None

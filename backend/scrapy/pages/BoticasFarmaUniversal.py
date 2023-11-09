@@ -119,16 +119,17 @@ class BoticasFarmaUniversal(Page):
                crossed_price = crossed_price.text
                 
             product = Product(
-                    name =  name,
+                    #id_sku =  if sku_id else None
+                    name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    price_box =  price,
-                    price_blister =  price,
-                    source_information = self.title,
+                    price_box =  price if price else None,
+                    price_blister =  price if price else None,
+                    source_information = self.title if self.title else None,
                     lifting_date =  None,
                     laboratory =  None,
                     card_discount =  None,
-                    crossed_price =  crossed_price,
+                    crossed_price =  crossed_price if crossed_price else None,
                     suggested_comment =  None
             )  
                     

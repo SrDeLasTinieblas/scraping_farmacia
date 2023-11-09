@@ -140,15 +140,16 @@ class BoticasPeru(Page):
                 
                 
                 product = Product(
-                    id_sku = sku_text,
-                    name =  name,
+                    id_botica = 4,
+                    id_sku = sku_text if name else None,
+                    name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    price_box =  f"S/{regular_price:.2f}",
+                    price_box =  f"S/{regular_price if regular_price else None:.2f}",
                     price_blister =  None,
-                    source_information = self.title,
+                    source_information = self.title if self.title else None,
                     lifting_date =  None,
-                    laboratory =  laboratorio,
+                    laboratory =  laboratorio if laboratorio else None,
                     card_discount =  None,
                     crossed_price =  None,
                     suggested_comment =  None

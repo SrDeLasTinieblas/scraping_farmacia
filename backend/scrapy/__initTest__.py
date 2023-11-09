@@ -8,10 +8,10 @@ import concurrent.futures
 import pyodbc
 
 
-server = 'tinieblaserver.database.windows.net'
+server = '154.53.44.5\SQLEXPRESS'
 database = 'testEmpresa'
-username = 'FacturacionInventario'
-password = 'Darkangelo2023'
+username = 'userTecnofarma'
+password = 'Tecn0farm@3102'
 
 # Crea una cadena de conexión
 conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'

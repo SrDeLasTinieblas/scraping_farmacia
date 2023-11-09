@@ -1,7 +1,7 @@
 
 class Product:
-        def __init__(self, id_sku, name, presentation, brand, price_box, price_blister, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment):
-            
+        def __init__(self, id_botica, id_sku, name, presentation, brand, price_box, price_blister, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment):
+            self.id_botica = id_botica
             self.id_sku = id_sku
             self.name = name
             self.presentation = presentation
@@ -18,6 +18,7 @@ class Product:
         def show_information(self):
                 
                 print("Product Information:")
+                print(f"\tSKU: {self.id_botica}")
                 print(f"\tSKU: {self.id_sku}")
                 print(f"\tName: {self.name}")
                 print(f"\tPresentation: {self.presentation}")
