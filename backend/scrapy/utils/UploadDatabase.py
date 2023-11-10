@@ -29,11 +29,7 @@ def upload_to_db(text_upload):
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
-        
-        #cursor.execute("{CALL uspOperacionesMovimientosImportarCSV (?)}", text_upload)
         cursor.execute("{CALL uspOperacionesMovimientosImportarCSV (?)}", (text_upload))
-
-        
         conn.commit()
         conn.close()
 

@@ -50,7 +50,7 @@ for botica in boticas:
         
         # Fack MultiTasking
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:20]}
+            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url}
             for future in concurrent.futures.as_completed(futures):
                 try:
                     product_url, products_internal = future.result()
