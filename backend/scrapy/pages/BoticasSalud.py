@@ -18,11 +18,12 @@ class BoticasSalud(Page):
         response_data = download_json(url)
         data = response_data["data"]
         #category_slugs = []
-        for category in data:
-            slug = category["slug"]
-            title = category["title"]
-            categories[slug] = title
-            #ategory_slugs.append(slug)
+        if data:
+            for category in data:
+                slug = category["slug"]
+                title = category["title"]
+                categories[slug] = title
+                #ategory_slugs.append(slug)
         return categories
     
     def get_product_urls(self, category_slug):

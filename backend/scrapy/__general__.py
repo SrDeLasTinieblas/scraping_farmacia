@@ -50,7 +50,7 @@ for botica in boticas:
         
         # Fack MultiTasking
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:5]}
+            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:20]}
             for future in concurrent.futures.as_completed(futures):
                 try:
                     product_url, products_internal = future.result()
@@ -95,8 +95,8 @@ for botica in boticas:
             
             final_products_text = simbol_concantened.join(product_texts)   
             final_concatenado = f"{botica.id}¯{final_products_text}{simbol_concantened}" 
-            print(final_concatenado)   
-            #upload_to_db(final_concatenado)
+            #print(final_concatenado)   
+            upload_to_db(final_concatenado)
         
             
   
