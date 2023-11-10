@@ -67,4 +67,8 @@ def download_json(url, method = "GET", headers = {}, data = {}):
     
   
 
+def get_ip_public():
+    data = download_json("https://ipwho.is/")
+    ip_public = data["ip"]
+    return ip_public 
     

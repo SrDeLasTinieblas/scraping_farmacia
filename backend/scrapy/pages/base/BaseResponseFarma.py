@@ -8,17 +8,19 @@ class BaseResponseFarma(Page):
     code_farma = None
     code_company = None
     
-    def __init__(self, title = None, url = None):
-        super().__init__(title, url)
+    def __init__(self, id = None, title = None, url = None):
+        super().__init__(id, title, url)
 
     def get_categories(self):        
-        categorys = []         
+        categorys = {}        
         category_url = f"https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/{self.code_farma}/departments?companyCode={self.code_company}&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
         data = download_json(category_url)
                 
-        categorys = []
         for item in data:   
-            categorys.append(item["id"])                              
+            category_id = item["id"]
+            category_name = item["name"]
+            categorys[category_id] = category_name
+            #categorys.append(item["id"])                              
                            
         return categorys
     
@@ -75,25 +77,27 @@ class BaseResponseFarma(Page):
         products_name = []
         products_id_row = []
         rows = response_data["rows"]#["data"]
+        if rows:
         #print("rows: ", rows)
-        for row in rows:
-            id_row = row["id"]
-            name = row["name"]
-            if name:
-                products_id_row.append(id_row)             
-                products_name.append(name)             
-            
+            for row in rows:
+                id_row = row["id"]
+                name = row["name"]
+                if name:
+                    products_id_row.append(id_row)             
+                    products_name.append(name)             
+                
         return products_id_row       
                     
                               
     def get_product(self, product_id):
-        product = None
         
         product_url = f"https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/{self.code_farma}/product/{product_id}?companyCode={self.code_company}&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
         json = download_json(product_url)
         if not json:
             print(f"{self.title} : Hubo un error al descargar el producto = {product_url}")
             return None
+            
+        products = []    
             
         try:
             
@@ -190,18 +194,20 @@ class BaseResponseFarma(Page):
                 name =  name,
                 presentation =  f"{fractionated_form} / {presentacion}",
                 brand = brand,
-                price_box =  f"S/{price:.2f}",
-                price_blister =  fractionated_price,
+                price =  f"S/{price:.2f}",
                 source_information =  self.title,
                 lifting_date =  None,
                 laboratory =  None,
                 card_discount =  f"Precio con todas las tarjetas: {price_with_payment_method} Precio Monedero del Ahorro: {price_all_payment_method}",
                 crossed_price =  None,
-                suggested_comment =  None
+                suggested_comment =  None,
+                description=None
             )
+            
+            products.append(product)
                 
              
         except Exception as e:
             print(f"{self.title} : Hubo un error al extraer datos en {product_url} -> {str(e)}")      
     
-        return product
+        return products if products else None

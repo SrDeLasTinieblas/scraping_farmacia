@@ -23,7 +23,7 @@ class BoticasHogarSalud(Page):
 
         all_products_urls = []  # Almacena todos los enlaces de productos de todas las categorías
         
-        category_urls = category_urls[:1]  # Limitar a una categoría (para pruebas)
+        #category_urls = category_urls[:1]  # Limitar a una categoría (para pruebas)
         for category_url in category_urls:
             product_urls_in_category = self.get_all_products_in_category(category_url)
             all_products_urls.extend(product_urls_in_category)

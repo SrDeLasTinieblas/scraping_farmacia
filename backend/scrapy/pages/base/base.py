@@ -4,12 +4,14 @@ from utils.NetUtils import download_json, download_page
 
 
 class Page:
-    def __init__(self, title = None, url = None):
+    def __init__(self, id = None, title = None, url = None):
+        
         if title is None:
             raise ValueError("El título debe definirse")
         if url is None:
             raise ValueError("La URL debe definirse")
         
+        self.id = id
         self.title = title
         self.url = url
 

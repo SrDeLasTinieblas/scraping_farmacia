@@ -2,10 +2,10 @@ import random
 import time
 from pages.BoticasPeru import BoticasPeru
 from pages.BoticasSalud import BoticasSalud
-from pages.BoticasHogarSalud import BoticasHogarSalud
-from pages.BoticasFarmaUniversal import BoticasFarmaUniversal
-from pages.BoticasMiFarma import BoticasMiFarma
-from pages.BoticasInkafarma import BoticasInkafarma
+from pages.HogarSalud import HogarSalud
+from pages.FarmaUniversal import FarmaUniversal
+from pages.MiFarmaX import MiFarma
+from pages.Inkafarma import Inkafarma
 from utils.NetUtils import download_page, get_random_user_agent
 import concurrent.futures
 
@@ -78,9 +78,12 @@ def download_page_main(page):
             futures = {executor.submit(download_product, page, product_url): product_url for product_url in products_black_list}
             for future in concurrent.futures.as_completed(futures):
                 product_url = futures[future]
-                product = future.result()
-                if product:
-                    products.append(product)
+                products_internal = future.result()
+                if products_internal:
+                    # Recuerda que ahora ya no traer un solo producto
+                    # sino un array de products, por eso recorremos
+                    for product_internal in products_internal:
+                        products.append(product_internal)
                 else:
                     print(f"{tag} >>> Error al descargar -> black product {product_url}")
 
@@ -99,8 +102,7 @@ def concatenate_products(products):
         print("Nombre : ", product.name)
         print("Presentacion : ", product.presentation)
         print("Marca : ", product.brand)
-        print("Precio por caja : ", product.price_box)
-        print("Precio blister : ", product.price_blister)
+        print("Precio por caja : ", product.price)
         print("Fuente de Information : ", product.source_information)
         print("Lifting Date : ", product.lifting_date)
         print("Laboratory : ", product.laboratory)

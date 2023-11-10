@@ -1,4 +1,5 @@
 import json
+import traceback
 from model.Models import Product
 from pages.base.base import Page
 from bs4 import BeautifulSoup
@@ -7,13 +8,15 @@ from utils.NetUtils import download_page
     
 class BoticasPeru(Page):
      
-    def __init__(self, title = "Boticas Peru", url = "https://boticasperu.pe"):
-        super().__init__(title, url)
+    def __init__(self, id = 4, title = "Boticas Peru", url = "https://boticasperu.pe"):
+        super().__init__(id, title, url)
 
     def get_categories(self):
         html = download_page(self.url)
                
-        categorys = []
+        #categorys = []
+        
+        categories = {}
         
         soup = BeautifulSoup(html, 'html.parser')
         nav_elements = soup.find_all('nav', class_='navigation')[0]
@@ -22,10 +25,13 @@ class BoticasPeru(Page):
             first_a_element = li_element.find('a')
             if first_a_element:
                 href_value = first_a_element.get('href')
+                title_value = first_a_element.find_all('span')[0].text
+                # print("title_value", title_value)
                 if href_value:
-                    categorys.append(href_value)               
+                    categories[href_value] = title_value
+                    #categorys.append(href_value)               
         
-        return categorys
+        return categories
     
     
     def get_product_urls(self, category_url):
@@ -83,14 +89,16 @@ class BoticasPeru(Page):
               
                        
     def get_product(self, url_product):
-        product = None
         
         html = download_page(url_product)
         if not html:
             print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
             return None
+        
+        products = []
             
         try:
+            
             soup = BeautifulSoup(html, 'html.parser')
         
             title_text = soup.find('h1', class_='page-title').text.strip()
@@ -132,6 +140,7 @@ class BoticasPeru(Page):
             # Busca elementos con la clase "old-price"
             old_price_elements = soup.find_all(class_='price-box price-final_price')
 
+            price_text = None
             # Itera a través de los elementos encontrados
             for element in old_price_elements:
                 # Dentro de cada elemento "old-price", busca el precio con la clase "price"
@@ -139,7 +148,7 @@ class BoticasPeru(Page):
                 # Si se encontró un precio, imprímelo
                 if price_element:
                     price_text = price_element.text.strip()
-                    print(price_text)
+                    #print(price_text)
 
             if target_json:
                 first_item = list(target_json["data"]["items"].values())[0]
@@ -152,28 +161,29 @@ class BoticasPeru(Page):
                 
                 
                 product = Product(
-                    id_botica = 4,
                     id_sku = sku_text if name else None,
                     name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    price_box =  f"S/{regular_price if regular_price else None:.2f}",
-                    price_blister =  None,
+                    price =  f"S/{regular_price if regular_price else None:.2f}",
                     source_information = self.title if self.title else None,
                     lifting_date =  None,
                     laboratory =  laboratorio if laboratorio else None,
                     card_discount =  None,
                     crossed_price =  price_text if price_text else None,
-                    suggested_comment =  None
+                    suggested_comment =  None,
+                    description=None
                 )
+                products.append(product)
                 
 
             else:
                 print("Elemento <script> no encontrado")    
-        except Exception as e:
+        except Exception as e:            
             print(f"{self.title} : Hubo un error al extraer datos en {url_product} -> {str(e)}")      
-    
-        return product
+            traceback.print_exc()
+            
+        return products if products else None
     
     
     
