@@ -18,12 +18,11 @@ class BoticasSalud(Page):
         response_data = download_json(url)
         data = response_data["data"]
         #category_slugs = []
-        if data:
-            for category in data:
-                slug = category["slug"]
-                title = category["title"]
-                categories[slug] = title
-                #ategory_slugs.append(slug)
+        for category in data:
+            slug = category["slug"]
+            title = category["title"]
+            categories[slug] = title
+            #ategory_slugs.append(slug)
         return categories
     
     def get_product_urls(self, category_slug):
@@ -33,19 +32,26 @@ class BoticasSalud(Page):
             print(f"{self.title} : Hubo un error al descargar category = {category_slug}")
             return None
         
-        total_items = response_data["data"]["totalItems"]
-        url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug}&filterBy=2&CurrentPage=1&PageSize={total_items}"
-        response_data = download_json(url)
-        
-        products_slug = []
-
-        data = response_data["data"]["data"]
-        for item in data:
-            slug = item["slug"]
-            if slug:
-                products_slug.append(slug)             
+        try:
+            total_items = response_data["data"]["totalItems"]
+            url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug}&filterBy=2&CurrentPage=1&PageSize={total_items}"
+            response_data = download_json(url)
             
-        return products_slug    
+            products_slug = []
+
+            data = response_data["data"]["data"]
+            for item in data:
+                slug = item["slug"]
+                if slug:
+                    products_slug.append(slug)             
+                
+            return products_slug 
+        
+        except Exception as e: 
+            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+
+        return None
+           
               
                        
     def get_product(self, product_slug):
@@ -174,5 +180,4 @@ class BoticasSalud(Page):
     
 
     
-
 

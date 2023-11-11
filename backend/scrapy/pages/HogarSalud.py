@@ -47,38 +47,42 @@ class HogarSalud(Page):
         products_url = []
         conter = 0  # Inicializa el contador en 0
         is_not_error = True
-                    
-        while is_not_error:
-            conter += 1  # Aumenta el contador en cada iteración
-            final_category_url = category_url
-                    # https://www.hogarysalud.com.pe/c/salud-y-bienestar/?per_page=100
-                    # https://www.hogarysalud.com.pe/c/salud-y-bienestar/page/2/?per_page=100
-                    
-            if conter == 1:
-                final_category_url = f"{category_url}?per_page=36"
-            elif conter >= 2:
-                final_category_url = f"{category_url}page/{conter}/?per_page=36"
-                
-            print(f"Pag :: {final_category_url}")
-            html = download_page(final_category_url)
-            
-            if html:
-                    soup = BeautifulSoup(html, 'html.parser')
-                    matching_links = soup.find_all('a', class_='product-image-link')
-                    for link in matching_links:
-                        href = link.get('href')
-                        products_url.append(href)
-                                
-            else:
+        try:
+                        
+            while is_not_error:
+                conter += 1  # Aumenta el contador en cada iteración
+                final_category_url = category_url
+                        # https://www.hogarysalud.com.pe/c/salud-y-bienestar/?per_page=100
+                        # https://www.hogarysalud.com.pe/c/salud-y-bienestar/page/2/?per_page=100
+                        
                 if conter == 1:
-                    no_pagination_url_tried = True
+                    final_category_url = f"{category_url}?per_page=36"
+                elif conter >= 2:
+                    final_category_url = f"{category_url}page/{conter}/?per_page=36"
+                    
+                print(f"Pag :: {final_category_url}")
+                html = download_page(final_category_url)
+                
+                if html:
+                        soup = BeautifulSoup(html, 'html.parser')
+                        matching_links = soup.find_all('a', class_='product-image-link')
+                        for link in matching_links:
+                            href = link.get('href')
+                            products_url.append(href)
+                                    
                 else:
-                    # is_not_error = True
-                    break  # Sale del bucle si no hay más productos en la página
+                    if conter == 1:
+                        no_pagination_url_tried = True
+                    else:
+                        # is_not_error = True
+                        break  # Sale del bucle si no hay más productos en la página
 
-        return products_url
+            return products_url             
+        except Exception as e: 
+            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
 
-
+        return None            
+        
                     
                             
     def get_product(self, url_product):

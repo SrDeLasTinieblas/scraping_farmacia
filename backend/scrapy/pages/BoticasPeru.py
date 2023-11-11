@@ -35,58 +35,64 @@ class BoticasPeru(Page):
     
     
     def get_product_urls(self, category_url):
-        products_url = []
-        conter = 0
-        is_equals = True
-        lastest_product_urls_hash = None
+        try:
+            
+            products_url = []
+            conter = 0
+            is_equals = True
+            lastest_product_urls_hash = None
+                    
+            while is_equals:
+                conter += 1
                 
-        while is_equals:
-            conter += 1
-            
-            final_category_url =  f"{category_url}?p={conter}"
-            print(f"Pag :: {final_category_url}")
-            products_url_internal = []
-            
-            try:
-                html = download_page(final_category_url)
-                if html:                                     
-                    soup = BeautifulSoup(html, 'html.parser')
-                    product_list = soup.find('ol', class_='products list items product-items')
+                final_category_url =  f"{category_url}?p={conter}"
+                print(f"Pag :: {final_category_url}")
+                products_url_internal = []
+                
+                try:
+                    html = download_page(final_category_url)
+                    if html:                                     
+                        soup = BeautifulSoup(html, 'html.parser')
+                        product_list = soup.find('ol', class_='products list items product-items')
 
-                    if product_list:
-                        product_items = product_list.find_all('li', class_='item product product-item')
-                        
-                        for item in product_items:
-                            product_link = item.find('a')['href']
-                            products_url_internal.append(product_link)
+                        if product_list:
+                            product_items = product_list.find_all('li', class_='item product product-item')
                             
-                else :
-                    print(f"{self.title} : Hubo un error al descargar el category = {final_category_url}")  
-                    products_url_internal = None           
+                            for item in product_items:
+                                product_link = item.find('a')['href']
+                                products_url_internal.append(product_link)
+                                
+                    else :
+                        print(f"{self.title} : Hubo un error al descargar el category = {final_category_url}")  
+                        products_url_internal = None           
+                                
+                except Exception as e:
+                    
+                    print(f"{self.title} : Hubo un error al extraer datos en {category_url} -> {str(e)}") 
+                
+                
+                    
+                if not products_url_internal:
+                    continue
                             
-            except Exception as e:
-                
-                print(f"{self.title} : Hubo un error al extraer datos en {category_url} -> {str(e)}") 
-            
-            
-                
-            if not products_url_internal:
-                continue
-                        
-            for product_url in products_url_internal:
-                products_url.append(product_url)                  
+                for product_url in products_url_internal:
+                    products_url.append(product_url)                  
 
+                
+                my_tuple = tuple(products_url_internal) 
+                hash_tuple = hash(my_tuple)
+                
+                if lastest_product_urls_hash == hash_tuple:
+                    is_equals = False
+                else:
+                    lastest_product_urls_hash = hash_tuple         
             
-            my_tuple = tuple(products_url_internal) 
-            hash_tuple = hash(my_tuple)
-            
-            if lastest_product_urls_hash == hash_tuple:
-                is_equals = False
-            else:
-                lastest_product_urls_hash = hash_tuple         
-        
-        return products_url    
-              
+            return products_url
+        except Exception as e: 
+            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+
+        return None
+               
                        
     def get_product(self, url_product):
         
@@ -193,4 +199,3 @@ class BoticasPeru(Page):
     
 
     
-

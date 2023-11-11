@@ -1,8 +1,6 @@
 import concurrent.futures
 import numpy as np
-
 from model.Models import Product
-
 from pages.FarmaUniversal import FarmaUniversal
 from pages.Inkafarma import Inkafarma
 from pages.MiFarmaX import MiFarma
@@ -13,13 +11,14 @@ from pages.HogarSalud import HogarSalud
 from utils.UploadDatabase import upload_to_db
 
 boticas = [
-    BoticasSalud(),
-    HogarSalud(), 
-    FarmaUniversal(),
-    Inkafarma(),
-    BoticasPeru(),
+    #BoticasSalud(),
+    #HogarSalud(), 
+    #FarmaUniversal(),
+    #Inkafarma(),
+    #BoticasPeru(),
     MiFarma()
 ]
+
 
 
 def download_product(botica, product_url):
@@ -39,8 +38,12 @@ for botica in boticas:
         print(tag, ">>>> ",category_title, ":", category_url)
         
         products_url = botica.get_product_urls(category_url)
-        products_url = list(set(products_url))
         
+        if not products_url:
+            print(f"{tag} >>> Hubo un error en la categoria {category_title} - {category_url}")
+            continue        
+               
+        products_url = list(set(products_url))            
         # Error download products
         products_black_list = []
         
@@ -63,7 +66,7 @@ for botica in boticas:
                         products_black_list.append(product_url)  
                 except Exception as e:                
                         print(f"Hubo un error al descargar product -> {str(e)}") 
-                  
+                
         
         if len(products_black_list) > 0:
             print(f"{tag} >>> Descargando productos de la Black List")
@@ -79,7 +82,7 @@ for botica in boticas:
                                 
                         else:
                             print(f"{tag} >>> Error al descargar -> black product {product_url}")
-                         
+                        
                             
                     except Exception as e:                
                         print(f"Hubo un error al descargar black product -> {str(e)}") 

@@ -70,23 +70,29 @@ class BaseResponseFarma(Page):
             
         #print("response: ", response_data)
         
-        #if not response_data:
-         #   print(f"{self.title} : Hubo un error al descargar producto = ")
-          #  return None
+        if not response_data:
+           print(f"{self.title} : Hubo un error al descargar category = {category_id}")
+           return None
         
-        products_name = []
-        products_id_row = []
-        rows = response_data["rows"]#["data"]
-        if rows:
-        #print("rows: ", rows)
+
+        try: 
+            products_id_row = []
+            products_name = []
+            rows = response_data["rows"]#["data"]
+            #print("rows: ", rows)
             for row in rows:
                 id_row = row["id"]
                 name = row["name"]
                 if name:
                     products_id_row.append(id_row)             
                     products_name.append(name)             
-                
-        return products_id_row       
+            
+            return products_id_row  
+        except Exception as e: 
+            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+
+        return None
+             
                     
                               
     def get_product(self, product_id):

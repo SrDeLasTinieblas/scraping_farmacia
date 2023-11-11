@@ -13,6 +13,7 @@ class FarmaUniversal(Page):
     def get_categories(self):
         html = download_page(self.url)
         soup = BeautifulSoup(html, 'html.parser')
+            
                 
         categories = {} 
         nav_element = soup.find('nav', {'id': 'cabecera-productos'})
@@ -46,57 +47,65 @@ class FarmaUniversal(Page):
         response is offset = 48     tot_result = 16        
     
         """
-        there_are_more_pages = True   
-        last_total_result = 0    
-       
-        while there_are_more_pages:       
-            post_url = f"{self.url}/productos/cargarproductos"
-            offset = last_total_result
-            payload = f"orden=&idcate={category_id}&idsubcate=0&offset={offset}&scroll=true"
-            
-            #print("payload", payload)
-            print("categoria::.", post_url)
-            headers = {
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Origin': f"{self.url}",
-            'Connection': 'keep-alive',
-            'Referer': f"{category_url}",
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-origin',
-            }
-                    
-            response_data = download_json(url = post_url, method="POST", headers=headers, data=payload)
-            
-            html_data = response_data["html"]                
-            response_last_total_result = response_data["tot_result"]  
-                          
-            if response_last_total_result:
-                last_total_result += response_last_total_result              
-                          
-            if response_last_total_result == 0:
-                there_are_more_pages = False
-                continue   
-            
-             
-            
-            # offset = response_data["offset"]
-            soup = BeautifulSoup(html_data, 'html.parser')
-            products_elements = soup.find_all('a', href=lambda href: href and href.startswith('producto'))
-            for link in products_elements:
-                href = link["href"]
-                # href default  ==  producto\/detalle\/416-headshoulders-hidratacion-coco-shampoo-x-180-ml\
-                # https://farmaciauniversal.com/producto/detalle/30/304/pantene-rizos-definidos-acondicionador-x-400-ml
-                if href.startswith('producto'):
-                    href = f"{self.url}/{href}"
+        
+        try:
+            there_are_more_pages = True   
+            last_total_result = 0    
+        
+            while there_are_more_pages:       
+                post_url = f"{self.url}/productos/cargarproductos"
+                offset = last_total_result
+                payload = f"orden=&idcate={category_id}&idsubcate=0&offset={offset}&scroll=true"
                 
-                product_urls.append(href)   
-                 
-        return product_urls    
+                #print("payload", payload)
+                print("categoria::.", post_url)
+                headers = {
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Origin': f"{self.url}",
+                'Connection': 'keep-alive',
+                'Referer': f"{category_url}",
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin',
+                }
+                        
+                response_data = download_json(url = post_url, method="POST", headers=headers, data=payload)
+                
+                html_data = response_data["html"]                
+                response_last_total_result = response_data["tot_result"]  
+                            
+                if response_last_total_result:
+                    last_total_result += response_last_total_result              
+                            
+                if response_last_total_result == 0:
+                    there_are_more_pages = False
+                    continue   
+                
+                
+                
+                # offset = response_data["offset"]
+                soup = BeautifulSoup(html_data, 'html.parser')
+                products_elements = soup.find_all('a', href=lambda href: href and href.startswith('producto'))
+                for link in products_elements:
+                    href = link["href"]
+                    # href default  ==  producto\/detalle\/416-headshoulders-hidratacion-coco-shampoo-x-180-ml\
+                    # https://farmaciauniversal.com/producto/detalle/30/304/pantene-rizos-definidos-acondicionador-x-400-ml
+                    if href.startswith('producto'):
+                        href = f"{self.url}/{href}"
+                    
+                    product_urls.append(href)   
+                    
+            return product_urls
+        except Exception as e: 
+            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+
+        return None
+        
+            
                     
                             
     def get_product(self, url_product):
