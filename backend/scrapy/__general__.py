@@ -1,6 +1,8 @@
 import concurrent.futures
 import numpy as np
+
 from model.Models import Product
+
 from pages.FarmaUniversal import FarmaUniversal
 from pages.Inkafarma import Inkafarma
 from pages.MiFarmaX import MiFarma
@@ -96,12 +98,10 @@ for botica in boticas:
         for chunk in chunks:
             product_texts = [product_internal.show_information() for product_internal in chunk]
             
-            final_products_text = simbol_concantened.join(product_texts)   
-            final_concatenado = f"{botica.id}¯{final_products_text}{simbol_concantened}" 
-            #print(final_concatenado)   
-            upload_to_db(final_concatenado)
-        
-            
+            final_products_text = simbol_concantened.join(product_texts)            
+            print(final_products_text)   
+            upload_to_db(f"{botica.id}¯{final_products_text}{simbol_concantened}")
+                    
   
     print("\n\n")
     

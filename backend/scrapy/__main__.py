@@ -12,7 +12,7 @@ from pages.BoticasPeru import BoticasPeru
 from pages.HogarSalud import HogarSalud
 
 
-from pages.MiFarmaX import MiFarma
+from pages.MiFarma import MiFarma
 from utils.NetUtils import download_page, get_random_user_agent
 import concurrent.futures
 
@@ -27,7 +27,6 @@ import concurrent.futures
     Digemin             = 6
     
 """
-
 
 botica = BoticasPeru()
 product_url = "https://boticasperu.pe/acondicionador-pantene-restauracion-frasco-400-ml.html"
