@@ -13,12 +13,12 @@ from pages.HogarSalud import HogarSalud
 from utils.UploadDatabase import upload_to_db
 
 boticas = [
-    #BoticasSalud(),
-    #HogarSalud(), 
-    #FarmaUniversal(),
-    #Inkafarma(),
-    #BoticasPeru(),
-    MiFarma()
+    BoticasSalud(),
+    HogarSalud(), 
+    FarmaUniversal(),
+    Inkafarma(),
+    BoticasPeru(),
+    #MiFarma()
 ]
 
 
@@ -55,7 +55,7 @@ for botica in boticas:
         
         # Fack MultiTasking
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url}
+            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:5]}
             for future in concurrent.futures.as_completed(futures):
                 try:
                     product_url, products_internal = future.result()
@@ -98,9 +98,10 @@ for botica in boticas:
         for chunk in chunks:
             product_texts = [product_internal.show_information() for product_internal in chunk]
             
-            final_products_text = simbol_concantened.join(product_texts)            
+            final_products_text = simbol_concantened.join(product_texts)
+            final_products_text = f"{botica.id}¯{final_products_text}{simbol_concantened}"
             print(final_products_text)   
-            upload_to_db(f"{botica.id}¯{final_products_text}{simbol_concantened}")
+            #upload_to_db(f"{botica.id}¯{final_products_text}{simbol_concantened}")
                     
   
     print("\n\n")

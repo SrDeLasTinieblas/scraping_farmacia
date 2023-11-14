@@ -33,7 +33,7 @@ class FarmaUniversal(Page):
     def get_product_urls(self, category_url):
         category_id = None
         product_urls = []
-                   
+        
         match = re.search(r'/productos/(\d+)-', category_url)
         
         if match:
@@ -57,8 +57,8 @@ class FarmaUniversal(Page):
                 offset = last_total_result
                 payload = f"orden=&idcate={category_id}&idsubcate=0&offset={offset}&scroll=true"
                 
-                #print("payload", payload)
-                print("categoria::.", post_url)
+                print("payload", payload)
+                #print("categoria::.", post_url)
                 headers = {
                 'Accept': 'application/json, text/javascript, */*; q=0.01',
                 'Accept-Language': 'en-US,en;q=0.5',
