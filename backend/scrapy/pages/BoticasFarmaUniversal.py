@@ -6,7 +6,7 @@ import re
 
 class BoticasFarmaUniversal(Page):
     
-    def __init__(self, title = "Boticas Farma Universal", url = "https://farmaciauniversal.com"):
+    def __init__(self, title = "Boticas Farma Universal", url = "https://farmaciauniversal.com/"):
         super().__init__(title, url)
 
     def get_categories(self):
@@ -52,8 +52,8 @@ class BoticasFarmaUniversal(Page):
             offset = last_total_result
             payload = f"orden=&idcate={category_id}&idsubcate=0&offset={offset}&scroll=true"
             
-            #print("payload", payload)
-            print("categoria::.", post_url)
+            print("payload", payload)
+            #print("categoria::.", post_url)
             headers = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Language': 'en-US,en;q=0.5',
@@ -79,8 +79,6 @@ class BoticasFarmaUniversal(Page):
             if response_last_total_result == 0:
                 there_are_more_pages = False
                 continue   
-            
-             
             
             # offset = response_data["offset"]
             soup = BeautifulSoup(html_data, 'html.parser')

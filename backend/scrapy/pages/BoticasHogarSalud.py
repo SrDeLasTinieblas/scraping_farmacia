@@ -28,7 +28,7 @@ class BoticasHogarSalud(Page):
             product_urls_in_category = self.get_all_products_in_category(category_url)
             all_products_urls.extend(product_urls_in_category)
 
-        print("Total de enlaces de productos de todas las categorías:", len(all_products_urls))
+        p#rint("Total de enlaces de productos de todas las categorías:", len(all_products_urls))
         return list(set(category_urls))
     
     def get_all_products_in_category(self, category_url):
@@ -49,7 +49,7 @@ class BoticasHogarSalud(Page):
             elif conter >= 2:
                 final_category_url = f"{category_url}page/{conter}/?per_page=36"
                 
-            print(f"Pag :: {final_category_url}")
+            #print(f"Pag :: {final_category_url}")
             html = download_page(final_category_url)
             
             if html:
@@ -106,10 +106,7 @@ class BoticasHogarSalud(Page):
             '''
         
         return products_url
-
-
-                    
-                            
+    
     def get_product(self, url_product):
         product = None
                 

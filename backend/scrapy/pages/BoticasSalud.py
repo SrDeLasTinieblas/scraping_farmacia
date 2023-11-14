@@ -7,7 +7,7 @@ from utils.NetUtils import download_json, download_page, get_random_user_agent
 
 class BoticasSalud(Page):
     
-    def __init__(self, id = 3, title = "Boticas y Salud", url = "https://www.boticasysalud.com"):
+    def __init__(self, id = 3, title = "Boticas y Salud", url = "https://www.boticasysalud.com/"):
         super().__init__(id, title, url)
 
     def get_categories(self):

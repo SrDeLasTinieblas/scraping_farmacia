@@ -30,7 +30,7 @@ def scrape_selected_pages(selected_pags):
     mi_farma = MiFarma()
 
     for pag in selected_pags:
-        if pag['value'] == "https://www.boticasysalud.com/":
+        if pag['value'] == botica_salud.url:
             categories = botica_salud.get_categories()
             total_categories = len(categories)
             print(f"Tamaño de categorías en {pag['name']}: {total_categories}")
@@ -40,7 +40,7 @@ def scrape_selected_pages(selected_pags):
                 total_products += len(botica_salud.get_product_urls(category_url))
             print(f"Tamaño total de productos en {pag['name']}: {total_products}")
 
-        elif pag['value'] == "https://boticasperu.pe/":
+        elif pag['value'] == botica_peru.url:
             categories = botica_peru.get_categories()
             total_categories = len(categories)
             print(f"Tamaño de categorías en {pag['name']}: {total_categories}")
@@ -55,8 +55,9 @@ def scrape_selected_pages(selected_pags):
             tiempo_transcurrido = fin - inicio
             print(f">>> Tiempo transcurrido para obtener todos los URLs de productos es: {tiempo_transcurrido:.2f} segundos")
         
-        elif pag['value'] == "https://www.hogarysalud.com.pe/":
+        elif pag['value'] == hogar_salud.url:
             categories = hogar_salud.get_categories()
+            #print("categorias", categories)
             total_categories = len(categories)
             print(f"Tamaño de categorías en {pag['name']}: {total_categories}")
 
@@ -71,7 +72,7 @@ def scrape_selected_pages(selected_pags):
             print(f">>> Tiempo transcurrido para obtener todos los URLs de productos es: {tiempo_transcurrido:.2f} segundos")
         
         
-        elif pag['value'] == "https://farmaciauniversal.com":
+        elif pag['value'] == farmacia_universal.url:
             categories = farmacia_universal.get_categories()
             total_categories = len(categories)
             print(f"Tamaño de categorías en {pag['name']}: {total_categories}")
@@ -80,6 +81,7 @@ def scrape_selected_pages(selected_pags):
             inicio = time.time()
 
             for category_url in categories:
+                print("category url: ", category_url)
                 total_products += len(farmacia_universal.get_product_urls(category_url))
             print(f"Tamaño total de productos en {pag['name']}: {total_products}")
             fin = time.time()
@@ -129,7 +131,12 @@ def scrape_selected_pages(selected_pags):
         tag = botica.title
         
         categories = botica.get_categories()
-        for category_url, category_title in list(categories.items()):
+        print("all", categories)
+        
+        categories = list(categories.items()).get_categories()[:1]
+        print("uno", categories)
+        
+        for category_url, category_title in categories:
             print(tag, ">>>> ", category_title, ":", category_url)
             
             products_url = botica.get_product_urls(category_url)
@@ -147,7 +154,7 @@ def scrape_selected_pages(selected_pags):
             
             # Fake MultiTasking
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-                futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url}
+                futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:5]}
                 for future in concurrent.futures.as_completed(futures):
                     try:
                         product_url, products_internal = future.result()
@@ -204,8 +211,7 @@ pags_farmacias = [
     {"name": "Hogar y Salud", "value": "https://www.hogarysalud.com.pe/"},
     {"name": "Farmacia Universal", "value": "https://farmaciauniversal.com/"},
     {"name": "Inkafarma", "value": "https://inkafarma.pe/"},
-    {"name": "Mi Farma", "value": "https://www.mifarma.com.pe/"},
-    # Agrega más opciones según sea necesario
+    {"name": "Mi Farma", "value": "https://www.mifarma.com.pe/"}
 ]
 
 # Preguntar al usuario qué páginas quiere scrapear
@@ -218,7 +224,7 @@ answers = inquirer.prompt(questions)
 
 selected_pags = answers.get('Farmacias', [])
 
-print(selected_pags)
+#print(selected_pags)
 # Llamar a la función de scraping solo si se seleccionaron páginas
 if selected_pags:
     scrape_selected_pages(selected_pags)

@@ -6,7 +6,7 @@ from utils.NetUtils import download_page
 
 class HogarSalud(Page):
     
-    def __init__(self, id = 5, title = "Hogar y Salud", url = "https://www.hogarysalud.com.pe"):
+    def __init__(self, id = 5, title = "Hogar y Salud", url = "https://www.hogarysalud.com.pe/"):
         super().__init__(id, title, url)
 
     
@@ -14,20 +14,24 @@ class HogarSalud(Page):
         html = download_page(self.url)
         
         categories = {}
+        category_urls = []
         
         soup = BeautifulSoup(html, 'html.parser')
         elements_menu_item = soup.find_all('li', id=lambda x: x and x.startswith('menu-item-'))
-
+        #print("element: ", elements_menu_item)
         for element in elements_menu_item:
             a_element = element.find("a")
-            href = a_element["href"] 
-            
+            href = a_element["href"]
+            #print("href: ", href)  
             if href and href.startswith(f"{self.url}/c/"):
-                #category_urls.append(href)
+                print("href: ", href.startswith(f"{self.url}/c/"))
+                category_urls.append(href)
                 title = a_element.find('span', class_='nav-link-text')
                 if title: 
                     title = title.text
                     categories[href] = title
+                    #print("category_urls: ", category_urls)
+            #print("title: ", title)
 
         """  
         
@@ -60,7 +64,7 @@ class HogarSalud(Page):
                 elif conter >= 2:
                     final_category_url = f"{category_url}page/{conter}/?per_page=36"
                     
-                print(f"Pag :: {final_category_url}")
+                #print(f"Pag :: {final_category_url}")
                 html = download_page(final_category_url)
                 
                 if html:
@@ -79,7 +83,7 @@ class HogarSalud(Page):
 
             return products_url             
         except Exception as e: 
-            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_url} -> {str(e)}")      
 
         return None            
         

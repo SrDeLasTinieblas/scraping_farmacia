@@ -7,7 +7,7 @@ import re
 
 class FarmaUniversal(Page):
     
-    def __init__(self, id = 1, title = "Farma Universal", url = "https://farmaciauniversal.com"):
+    def __init__(self, id = 1, title = "Farma Universal", url = "https://farmaciauniversal.com/"):
         super().__init__(id, title, url)
 
     def get_categories(self):
@@ -57,7 +57,7 @@ class FarmaUniversal(Page):
                 offset = last_total_result
                 payload = f"orden=&idcate={category_id}&idsubcate=0&offset={offset}&scroll=true"
                 
-                print("payload", payload)
+                #print("payload", payload)
                 #print("categoria::.", post_url)
                 headers = {
                 'Accept': 'application/json, text/javascript, */*; q=0.01',

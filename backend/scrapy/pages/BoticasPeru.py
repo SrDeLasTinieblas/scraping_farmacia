@@ -8,7 +8,7 @@ from utils.NetUtils import download_page
     
 class BoticasPeru(Page):
      
-    def __init__(self, id = 4, title = "Boticas Peru", url = "https://boticasperu.pe"):
+    def __init__(self, id = 4, title = "Boticas Peru", url = "https://boticasperu.pe/"):
         super().__init__(id, title, url)
 
     def get_categories(self):
@@ -46,7 +46,7 @@ class BoticasPeru(Page):
                 conter += 1
                 
                 final_category_url =  f"{category_url}?p={conter}"
-                print(f"Pag :: {final_category_url}")
+                #print(f"Pag :: {final_category_url}")
                 products_url_internal = []
                 
                 try:
@@ -89,7 +89,7 @@ class BoticasPeru(Page):
             
             return products_url
         except Exception as e: 
-            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en -> {str(e)}")      
 
         return None
                

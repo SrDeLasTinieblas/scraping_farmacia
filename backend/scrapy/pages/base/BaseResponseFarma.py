@@ -107,7 +107,6 @@ class BaseResponseFarma(Page):
             
         try:
             
-            
             """
                 response Json
                 
@@ -183,7 +182,6 @@ class BaseResponseFarma(Page):
                     }
                 
             """
-           
             name = json["name"]
             price = float(json["price"])
             sku_mifarma = json["skuMifarma"]
@@ -204,7 +202,8 @@ class BaseResponseFarma(Page):
                 source_information =  self.title,
                 lifting_date =  None,
                 laboratory =  None,
-                card_discount =  f"Precio con todas las tarjetas: {price_with_payment_method} Precio Monedero del Ahorro: {price_all_payment_method}",
+                #card_discount =  f"Precio con todas las tarjetas: {price_with_payment_method} Precio Monedero del Ahorro: {price_all_payment_method}",
+                card_discount = f"{price_all_payment_method}",
                 crossed_price =  None,
                 suggested_comment =  None,
                 description=None
