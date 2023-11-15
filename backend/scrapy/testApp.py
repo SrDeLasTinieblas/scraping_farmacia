@@ -131,13 +131,13 @@ def scrape_selected_pages(selected_pags):
         tag = botica.title
         
         categories = botica.get_categories()
-        print("all", categories)
+        #print("all", categories)
         
-        categories = list(categories.items()).get_categories()[:1]
-        print("uno", categories)
-        
-        for category_url, category_title in categories:
-            print(tag, ">>>> ", category_title, ":", category_url)
+        # Filtra para procesar solo una categoría, por ejemplo, la primera categoría
+        filtered_categories = list(categories.items())[:2]
+        #print("uno", filtered_categories)
+
+        for category_url, category_title in filtered_categories:
             
             products_url = botica.get_product_urls(category_url)
             
@@ -189,17 +189,17 @@ def scrape_selected_pages(selected_pags):
                             print(f"Hubo un error al descargar black product -> {str(e)}") 
                 
             
-            chunk_size = 50
-            simbol_concantened = "¬"
-            chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
+        chunk_size = 50
+        simbol_concantened = "¬"
+        chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
 
-            # Recorrer los trozos
-            for chunk in chunks:
-                product_texts = [product_internal.show_information() for product_internal in chunk]
+        # Recorrer los trozos
+        for chunk in chunks:
+            product_texts = [product_internal.show_information() for product_internal in chunk]
                 
-                final_products_text = simbol_concantened.join(product_texts)            
-                print(final_products_text)   
-                upload_to_db(f"{botica.id}¯{final_products_text}{simbol_concantened}")
+            final_products_text = simbol_concantened.join(product_texts)            
+            print(final_products_text)   
+            upload_to_db(final_products_text)
                         
       
         print("\n\n")

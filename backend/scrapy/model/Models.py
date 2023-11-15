@@ -28,7 +28,7 @@ class Product:
                 print(f"\tName: {self.name}")
                 print(f"\tPresentation: {self.presentation}")
                 print(f"\tBrand: {self.brand}")
-                print(f"\tPrice Box: {self.price}")
+                print(f"\tPrice: {self.price}")
                 print(f"\tSource Information: {self.source_information}")
                 print(f"\tLifting Date: {self.lifting_date}")
                 print(f"\tLaboratory: {self.laboratory}")

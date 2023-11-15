@@ -4,7 +4,7 @@ from model.Models import Product
 from pages.base.base import Page
 from bs4 import BeautifulSoup
 from utils.NetUtils import download_page
-
+import re
     
 class BoticasPeru(Page):
      
@@ -113,23 +113,50 @@ class BoticasPeru(Page):
             strong_element = sku_div.find('div', class_='value')
             sku_text = strong_element.text.strip()
             
+            # Busca elementos con la clase "old-price"
+            old_price_elements = soup.find_all(class_='price-box price-final_price')
+
+            price_crossed = None  # Inicializar price_crossed antes del bucle
+
+            # Busca elementos con la clase "old-price"
+            old_price_elements = soup.find_all(class_='price-box price-final_price')
+
+            # Itera a través de los elementos encontrados
+            for element in old_price_elements:
+                # Dentro de cada elemento "old-price", busca el precio con la clase "price"
+                price_element = element.find(class_='old-price')
+                # Si se encontró un precio, imprímelo y asigna el valor a price_crossed
+                if price_element:
+                    price_text = price_element.text.strip()
+                    price_crossed = re.sub(r'[^\d.]', '', price_text)
+                    #print("price_crossed: ", price_crossed)
+                    
             product_info = {}  # Crear un diccionario para almacenar la información
-            
+
             table = soup.find('tbody')
-            
+            # Inicializar laboratorio y price_crossed fuera del bucle
+            laboratorio = None
+            price_crossed = None
+
             if table:
                 rows = table.find_all('tr')
-                
+
+                # Inicializar laboratorio fuera del bucle
+                laboratorio = None
+
                 for row in rows:
                     header_cell = row.find('th', class_='col label')
                     data_cell = row.find('td', class_='col data')
-                    
+
                     if header_cell and data_cell:
                         header_text = header_cell.text.strip()
                         data_text = data_cell.text.strip()
-                        
+
                         product_info[header_text] = data_text
-                        laboratorio = product_info.get('Laboratorio', None)
+
+                        # Asignar valor a laboratorio solo si el encabezado es 'Laboratorio'
+                        if header_text == 'Laboratorio':
+                            laboratorio = data_text
 
             
             script_elements = soup.find_all('script', type='text/x-magento-init')
@@ -142,41 +169,34 @@ class BoticasPeru(Page):
                 if "Magento_Catalog/js/product/view/provider" in script_content:
                     target_json = data["*"]["Magento_Catalog/js/product/view/provider"]
                     break
+            
+            
                 
-            # Busca elementos con la clase "old-price"
-            old_price_elements = soup.find_all(class_='price-box price-final_price')
-
-            price_text = None
-            # Itera a través de los elementos encontrados
-            for element in old_price_elements:
-                # Dentro de cada elemento "old-price", busca el precio con la clase "price"
-                price_element = element.find(class_='old-price')
-                # Si se encontró un precio, imprímelo
-                if price_element:
-                    price_text = price_element.text.strip()
-                    #print(price_text)
-
             if target_json:
                 first_item = list(target_json["data"]["items"].values())[0]
                 nombre = first_item.get("images")
                 name = nombre[0]["label"]
+                
+                # Dividir la cadena desde la derecha usando " - " como delimitador
+                parts = name.rsplit(" - ", 1)
+
+                # Ahora, 'parts' es una lista con dos elementos, donde el último elemento es la presentación
+                presentation = parts[-1]
 
                 prices_info = first_item.get("price_info")
-                #final_price = prices_info["final_price"]
-                regular_price = prices_info["regular_price"]
-                
+                final_price = prices_info["final_price"]
                 
                 product = Product(
                     id_sku = sku_text if name else None,
                     name =  name if name else None,
-                    presentation =  None,
+                    presentation =  presentation if presentation else None,
                     brand =  None,
-                    price =  f"S/{regular_price if regular_price else None:.2f}",
+                    price =  final_price if final_price else None,
                     source_information = self.title if self.title else None,
                     lifting_date =  None,
                     laboratory =  laboratorio if laboratorio else None,
                     card_discount =  None,
-                    crossed_price =  price_text if price_text else None,
+                    crossed_price =  price_crossed if price_crossed else None,
                     suggested_comment =  None,
                     description=None
                 )
@@ -199,4 +219,3 @@ class BoticasPeru(Page):
     
 
     
-

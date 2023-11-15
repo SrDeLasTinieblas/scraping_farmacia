@@ -22,7 +22,7 @@ class BoticasSalud(Page):
             slug = category["slug"]
             title = category["title"]
             categories[slug] = title
-            #ategory_slugs.append(slug)
+            #category_slugs.append(slug)
         return categories
     
     def get_product_urls(self, category_slug):
@@ -48,7 +48,7 @@ class BoticasSalud(Page):
             return products_slug 
         
         except Exception as e: 
-            print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_slug} -> {str(e)}")      
 
         return None
            
@@ -76,7 +76,6 @@ class BoticasSalud(Page):
             brand = product_brand["title"]
             sku_id = item["skuIdClient"]
 
-            
 
             laboratory = next((details["description"] for details in item["details"] if details["name"] == "Laboratorio"), None)
 

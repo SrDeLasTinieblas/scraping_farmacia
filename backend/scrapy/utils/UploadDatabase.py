@@ -22,10 +22,11 @@ def upload_to_db(text_upload):
     password = 'Tecn0farm@3102'
     
     """
-    server = ''
-    database = ''
-    username = ''
-    password = ''
+    
+    server = '154.53.44.5\SQLEXPRESS'
+    database = 'BDCOMPRESOFT'
+    username = 'userTecnofarma'
+    password = 'Tecn0farm@3102'
     
 
     conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
@@ -45,6 +46,23 @@ def upload_to_db(text_upload):
         traceback.print_exc()
         return False
     
+    
+        '''
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        cursor.execute("{CALL uspOperacionesMovimientosImportarCSV (?)}", (text_upload))
+        conn.commit()
+        conn.close()
+
+        return True 
+    except Exception as e:
+        print(f"Error al cargar en la base de datos: {str(e)}")
+        traceback.print_exc()
+        return False
+    
+        '''
+        
         '''
         # Establece la conexión
         conn = pyodbc.connect(conn_str)
@@ -62,5 +80,13 @@ def upload_to_db(text_upload):
         # Cierra el cursor y la conexión
         cursor.close()
         conn.close()
-    '''
+        '''
+
+
+
+
+
+
+
+
 

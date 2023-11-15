@@ -13,8 +13,7 @@ class FarmaUniversal(Page):
     def get_categories(self):
         html = download_page(self.url)
         soup = BeautifulSoup(html, 'html.parser')
-            
-                
+        
         categories = {} 
         nav_element = soup.find('nav', {'id': 'cabecera-productos'})
         products_link = nav_element.find_all('a', href=lambda href: href and href.startswith('productos'))
@@ -97,8 +96,7 @@ class FarmaUniversal(Page):
                     if href.startswith('producto'):
                         href = f"{self.url}/{href}"
                     
-                    product_urls.append(href)   
-                    
+                    product_urls.append(href)
             return product_urls
         except Exception as e: 
             print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
@@ -119,13 +117,38 @@ class FarmaUniversal(Page):
         try:
             soup = BeautifulSoup(html, 'html.parser')     
             name = soup.find('meta', {'property': 'og:title'})["content"]
+            # Busca el elemento <span> dentro del <p> con la clase específica
+            span_element = soup.find('p', class_='texto codigo izquierda alto2 rojo talla14 em2').find('span')
 
+            if span_element:
+                # Extrae el texto dentro del span
+                sku_text = span_element.text.strip()
+
+                # Utiliza regex para obtener solo los números
+                sku_numbers = re.search(r'\d+', sku_text)
+
+                if sku_numbers:
+                    sku = sku_numbers.group()
+                    #print(f"SKU encontrado: {sku}")
+                else:
+                    print("No se encontraron números en el SKU.")
+            else:
+                print("Elemento <span> no encontrado.")
+                
             productos_datos = soup.find('div', {'id': 'productos_datos'})
             #print("productos_datos", productos_datos)
             
             price = productos_datos.find('div', {'class': 'float'}).find('strong')
             price = price.text
            
+           # Utiliza una expresión regular para extraer solo los dígitos y el punto decimal
+            price_digits = re.sub(r'\D', '', price)
+
+            # Convierte la cadena resultante a un número de punto flotante
+            parsed_price = float(price_digits)
+
+            #print("parsed_price: ", parsed_price)
+
             crossed_price = productos_datos.find('div', {'class': 'float pregular2'})
             if crossed_price:
                crossed_price = crossed_price.find('span')
@@ -133,11 +156,12 @@ class FarmaUniversal(Page):
                   crossed_price = crossed_price.text
                 
             product = Product(
-                    id_sku = None,
+                    id_sku = sku if sku else None,
                     name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    price =  price if price else None,
+                    #price =  price if price else None,
+                    price = parsed_price if parsed_price else None,
                     source_information = self.title if self.title else None,
                     lifting_date =  None,
                     laboratory =  None,

@@ -198,7 +198,7 @@ class BaseResponseFarma(Page):
                 name =  name,
                 presentation =  f"{fractionated_form} / {presentacion}",
                 brand = brand,
-                price =  f"S/{price:.2f}",
+                price =  f"{price:.2f}",
                 source_information =  self.title,
                 lifting_date =  None,
                 laboratory =  None,
