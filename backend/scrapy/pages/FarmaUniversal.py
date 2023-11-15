@@ -160,7 +160,6 @@ class FarmaUniversal(Page):
                     name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    #price =  price if price else None,
                     price = parsed_price if parsed_price else None,
                     source_information = self.title if self.title else None,
                     lifting_date =  None,

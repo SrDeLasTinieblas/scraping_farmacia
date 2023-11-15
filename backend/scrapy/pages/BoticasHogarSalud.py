@@ -156,7 +156,7 @@ class BoticasHogarSalud(Page):
                 lifting_date=None,  
                 laboratory=None,  
                 card_discount=None,  
-                crossed_price=f"S/{price_box:.2f}" if price_box else None,
+                crossed_price=f"{price_box:.2f}" if price_box else None,
                 suggested_comment=None 
             )
 

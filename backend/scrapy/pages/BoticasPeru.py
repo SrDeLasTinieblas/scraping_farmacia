@@ -93,7 +93,7 @@ class BoticasPeru(Page):
 
         return None
                
-                       
+                   
     def get_product(self, url_product):
         
         html = download_page(url_product)
@@ -136,7 +136,7 @@ class BoticasPeru(Page):
             table = soup.find('tbody')
             # Inicializar laboratorio y price_crossed fuera del bucle
             laboratorio = None
-            price_crossed = None
+            #price_crossed = None
 
             if table:
                 rows = table.find_all('tr')
@@ -210,11 +210,114 @@ class BoticasPeru(Page):
             traceback.print_exc()
             
         return products if products else None
-    
-    
-    
 
-    
+
+    '''
+    def get_product(self, url_product):
+        html = download_page(url_product)
+        
+        if not html:
+            print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
+            return None
+
+        products = []
+
+        try:
+            soup = BeautifulSoup(html, 'html.parser')
+            title_text = soup.find('h1', class_='page-title').text.strip()
+            sku_div = soup.find('div', class_='product attribute sku')
+            strong_element = sku_div.find('div', class_='value')
+            sku_text = strong_element.text.strip()
+
+            # Busca elementos con la clase "old-price"
+            old_price_elements = soup.find_all(class_='price-box price-final_price')
+
+            # Inicializar price_crossed antes del bucle
+            price_crossed = None
+
+            # Itera a través de los elementos encontrados
+            for element in old_price_elements:
+                # Dentro de cada elemento "old-price", busca el precio con la clase "price"
+                price_element = element.find(class_='old-price')
+                # Si se encontró un precio, imprímelo y asigna el valor a price_crossed
+                if price_element:
+                    price_text = price_element.text.strip()
+                    price_crossed = re.sub(r'[^\d.]', '', price_text)
+                    # print("price_crossed: ", price_crossed)
+
+            product_info = {}  # Crear un diccionario para almacenar la información
+            table = soup.find('tbody')
+
+            # Inicializar laboratorio y price_crossed fuera del bucle
+            laboratorio = None
+
+            if table:
+                rows = table.find_all('tr')
+
+                for row in rows:
+                    header_cell = row.find('th', class_='col label')
+                    data_cell = row.find('td', class_='col data')
+
+                    if header_cell and data_cell:
+                        header_text = header_cell.text.strip()
+                        data_text = data_cell.text.strip()
+
+                        product_info[header_text] = data_text
+
+                        # Asignar valor a laboratorio solo si el encabezado es 'Laboratorio'
+                        if header_text == 'Laboratorio':
+                            laboratorio = data_text
+
+            script_elements = soup.find_all('script', type='text/x-magento-init')
+            target_json = None
+
+            for script_element in script_elements:
+                script_content = script_element.string
+                data = json.loads(script_content)
+
+                if "Magento_Catalog/js/product/view/provider" in script_content:
+                    target_json = data["*"]["Magento_Catalog/js/product/view/provider"]
+                    break
+
+            if target_json:
+                first_item = list(target_json["data"]["items"].values())[0]
+                nombre = first_item.get("images")
+                name = nombre[0]["label"]
+
+                # Dividir la cadena desde la derecha usando " - " como delimitador
+                parts = name.rsplit(" - ", 1)
+
+                # Ahora, 'parts' es una lista con dos elementos, donde el último elemento es la presentación
+                presentation = parts[-1]
+
+                prices_info = first_item.get("price_info")
+                final_price = prices_info["final_price"]
+
+                product = Product(
+                    id_sku=sku_text if name else None,
+                    name=name if name else None,
+                    presentation=presentation if presentation else None,
+                    brand=None,
+                    price=final_price if final_price else None,
+                    source_information=self.title if self.title else None,
+                    lifting_date=None,
+                    laboratory=laboratorio if laboratorio else None,
+                    card_discount=None,
+                    crossed_price=price_crossed if price_crossed else None,
+                    suggested_comment=None,
+                    description=None
+                )
+                products.append(product)
+
+            else:
+                print("Elemento <script> no encontrado")
+
+        except Exception as e:
+            print(f"{self.title} : Hubo un error al extraer datos en {url_product} -> {str(e)}")
+            traceback.print_exc()
+
+        return products if products else None
+    '''
 
     
 
