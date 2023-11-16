@@ -141,26 +141,31 @@ class FarmaUniversal(Page):
             price = productos_datos.find('div', {'class': 'float'}).find('strong')
             price = price.text
            
-           # Utiliza una expresión regular para extraer solo los dígitos y el punto decimal
-            price_digits = re.sub(r'\D', '', price)
+
+            # Imprime el valor de price antes de aplicar la expresión regular
+            #print("price antes de la expresión regular: ", price)
+
+            # Utiliza una expresión regular para extraer solo los dígitos y el punto decimal
+            #price_digits = re.sub(r'\D.', '', price)
 
             # Convierte la cadena resultante a un número de punto flotante
-            parsed_price = float(price_digits)
+            #parsed_price = float(price_digits)
 
-            #print("parsed_price: ", parsed_price)
+            #print("parsed_price: ", price.replace('S/', ''))
 
             crossed_price = productos_datos.find('div', {'class': 'float pregular2'})
             if crossed_price:
                crossed_price = crossed_price.find('span')
                if crossed_price:
                   crossed_price = crossed_price.text
+                  print("precio tachado: ", crossed_price)
                 
             product = Product(
                     id_sku = sku if sku else None,
                     name =  name if name else None,
                     presentation =  None,
                     brand =  None,
-                    price = parsed_price if parsed_price else None,
+                    price = price.replace('S/', '') if price.replace('S/', '') else None,
                     source_information = self.title if self.title else None,
                     lifting_date =  None,
                     laboratory =  None,

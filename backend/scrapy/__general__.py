@@ -15,9 +15,9 @@ from utils.UploadDatabase import upload_to_db
 boticas = [
     #BoticasPeru(),      # si envia  ---
     #BoticasSalud(),    # si envia  ---
-    #HogarSalud(),       # si envia ---
+    HogarSalud(),       # si envia ---
     #FarmaUniversal(),  # si envia  ---
-    Inkafarma()        # si envia
+    #Inkafarma()        # si envia
     
     #MiFarma()
 ]
@@ -37,7 +37,7 @@ for botica in boticas:
     tag = botica.title
     
     categories = botica.get_categories()
-    #for category_url, category_title in list(categories.items())[:3]:
+    #for category_url, category_title in list(categories.items())[:1]:
     for category_url, category_title in list(categories.items()):
         print(tag, ">>>> ",category_title, ":", category_url)
         

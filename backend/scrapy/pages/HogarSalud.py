@@ -114,6 +114,7 @@ class HogarSalud(Page):
                         description_presentacion = presentacion["variation_description"]
                         presentacion_attr = presentacion["attributes"]["attribute_pa_venta-por"]
                         
+                        
                         product = Product(
                             id_sku=sku_id if sku_id else None,
                             name=name if name else None,
@@ -150,11 +151,15 @@ class HogarSalud(Page):
                     crossed_price = max(prices_float)
                     price = min(prices_float)
                                                                                                
-                            
+                # Dividir la cadena desde la derecha usando " - " como delimitador
+                parts = name.rsplit(" - ", 1)
+
+                # Ahora, 'parts' es una lista con dos elementos, donde el último elemento es la presentación
+                presentation = parts[-1]
                 product = Product(
                     id_sku=sku_id if sku_id else None,
                     name=name if name else None,
-                    presentation = None,
+                    presentation = presentation,
                     brand=None, 
                     price=f"{price:.2f}" if price else None,
                     source_information=self.title if self.title else None,

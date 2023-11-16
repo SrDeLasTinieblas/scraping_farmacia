@@ -138,17 +138,24 @@ class BoticasHogarSalud(Page):
                 precios.append(precio_float)
 
             
+            presentacion = None
+
             if select_element:
                 opciones = select_element.find_all('option')
-                
                 presentacion = [opcion.text.strip() for opcion in opciones if opcion.get('value')]
+
+                #presentaciones = " / ".join(presentacion)
                 
-                presentaciones = " / ".join(presentacion)
-                
+            # Dividir la cadena desde la derecha usando " - " como delimitador
+            parts = name.rsplit(" - ", 1)
+
+            # Ahora, 'parts' es una lista con dos elementos, donde el último elemento es la presentación
+            presentation = parts[-1]
+            
             product = Product(
                 id_sku=sku_id if sku_id else None,
                 name=name if name else None,
-                presentation=presentaciones if presentaciones else None,
+                presentation=presentacion if presentacion else presentation,
                 brand=None, 
                 price_box=f"{precios[1]:.2f}" if precios and len(precios) > 1 else None,
                 price_blister=f"{precios[0]:.2f}" if precios and len(precios) > 0 else None,
@@ -159,6 +166,7 @@ class BoticasHogarSalud(Page):
                 crossed_price=f"{price_box:.2f}" if price_box else None,
                 suggested_comment=None 
             )
+
 
             
         except Exception as e:
