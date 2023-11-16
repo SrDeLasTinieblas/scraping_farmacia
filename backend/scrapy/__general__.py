@@ -16,8 +16,8 @@ boticas = [
     #BoticasPeru(),      # si envia  ---
     #BoticasSalud(),    # si envia  ---
     #HogarSalud(),       # si envia ---
-    FarmaUniversal(),  # si envia  ---
-    #Inkafarma()        # si envia
+    #FarmaUniversal(),  # si envia  ---
+    Inkafarma()        # si envia
     
     #MiFarma()
 ]
