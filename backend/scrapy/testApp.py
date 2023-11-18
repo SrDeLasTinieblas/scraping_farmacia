@@ -199,7 +199,7 @@ def scrape_selected_pages(selected_pags):
                 
             final_products_text = simbol_concantened.join(product_texts)            
             print(final_products_text)   
-            upload_to_db(final_products_text)
+            #upload_to_db(final_products_text)
                         
       
         print("\n\n")

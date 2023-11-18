@@ -13,8 +13,8 @@ from pages.HogarSalud import HogarSalud
 from utils.UploadDatabase import upload_to_db
 
 boticas = [
-    #BoticasPeru(),      # si envia  ---
-    BoticasSalud(),    # si envia  ---
+    BoticasPeru(),      # si envia  ---
+    #BoticasSalud(),    # si envia  ---
     #HogarSalud(),       # si envia ---
     #FarmaUniversal(),  # si envia  ---
     #Inkafarma()        # si envia
@@ -37,8 +37,8 @@ for botica in boticas:
     tag = botica.title
     
     categories = botica.get_categories()
-    #for category_url, category_title in list(categories.items())[:3]:
-    for category_url, category_title in list(categories.items()):
+    for category_url, category_title in list(categories.items())[:1]:
+    #for category_url, category_title in list(categories.items()):
         print(tag, ">>>> ",category_title, ":", category_url)
         
         products_url = botica.get_product_urls(category_url)
@@ -57,7 +57,7 @@ for botica in boticas:
         
         # Fack MultiTasking
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url}
+            futures = {executor.submit(download_product, botica, product_url): product_url for product_url in products_url[:10]}
             for future in concurrent.futures.as_completed(futures):
                 try:
                     product_url, products_internal = future.result()
@@ -92,18 +92,18 @@ for botica in boticas:
                         print(f"Hubo un error al descargar black product -> {str(e)}") 
             
         
-        chunk_size = 50
+        chunk_size = 5
         simbol_concantened = "¬"
         chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
 
         # Recorrer los trozos
         for chunk in chunks:
-            product_texts = [product_internal.show_information() for product_internal in chunk]
+            product_texts = [product_internal.show_information2() for product_internal in chunk]
             
             final_products_text = simbol_concantened.join(product_texts)
             final_products_text = f"{botica.id}¯{final_products_text}{simbol_concantened}"
             print(final_products_text)       
-            upload_to_db(final_products_text)
+            #upload_to_db(final_products_text)
                     
   
     print("\n\n")
