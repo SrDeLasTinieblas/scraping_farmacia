@@ -26,7 +26,6 @@ digemid = Digemid()
 
 
 categories = digemid.get_categories()
-
 simbol_concantened = "¬"
 products_information_list = []
 min_required_products = 5
@@ -38,7 +37,7 @@ while len(products_information_list) < min_required_products:
     # Recorrer cada categoría y obtener información de productos
     for category in categories:
         product_ids = digemid.get_product_urls(category)
-        for product_id in product_ids[:1]:
+        for product_id in product_ids:#[:1]:
             products = digemid.get_product(product_id)
             if len(products) >= 1:
                 print("Tamaño: ", len(products))
@@ -56,11 +55,17 @@ while len(products_information_list) < min_required_products:
                     else:
                         print("La información del producto es None. Intentando otro producto.")
 
-# Unir la lista de información de productos con el símbolo 'simbol_concantened'
-final_products_text = simbol_concantened.join(map(str, products_information_list))
-final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
-print(final_products_text)
-upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
+# Dividir la lista en trozos de 50 productos
+chunk_size = 50
+chunks = [products_information_list[i:i+chunk_size] for i in range(0, len(products_information_list), chunk_size)]
+
+# Iterar sobre los trozos y enviar a la base de datos
+for chunk in chunks:
+    # Unir la lista de información de productos con el símbolo 'simbol_concantened'
+    final_products_text = simbol_concantened.join(map(str, chunk))
+    final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
+    print(final_products_text)
+    # upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
 
 
             

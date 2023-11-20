@@ -36,7 +36,7 @@ class Digemid(Page):
         request_data_dic = {}
         
         
-        for first_five_words in first_five_words_list[:10]:
+        for first_five_words in first_five_words_list:#[:10]:
             search_word = first_five_words  
                       
             url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/producto/autocompleteciudadano"
