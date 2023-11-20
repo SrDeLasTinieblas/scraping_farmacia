@@ -98,7 +98,7 @@ for botica in boticas:
 
         # Recorrer los trozos
         for chunk in chunks:
-            product_texts = [product_internal.show_information2() for product_internal in chunk]
+            product_texts = [product_internal.show_information() for product_internal in chunk]
             
             final_products_text = simbol_concantened.join(product_texts)
             final_products_text = f"{botica.id}¯{final_products_text}{simbol_concantened}"

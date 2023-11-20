@@ -7,7 +7,7 @@ from utils.Utils import unique_text, decode_base64, hyphenated_string_to_tuple, 
 
 class Digemid(Page):
     
-    def __init__(self, id = 5, title = "Digemid", url = "https://opm-digemid.minsa.gob.pe"):
+    def __init__(self, id = 6, title = "Digemid", url = "https://opm-digemid.minsa.gob.pe"):
         super().__init__(id, title, url)
     
     
@@ -17,9 +17,9 @@ class Digemid(Page):
         categories[url] = "main"        
         return categories
     
-    
     def get_product_urls(self, category_url):
         response_json = download_json(category_url)
+        
         # 1) Del Json obtener los nombres del producto "Nom_Prod" -> Ejemplo = DAVINTEX 120
         
         first_five_words_list = []
@@ -158,8 +158,8 @@ class Digemid(Page):
                 codEstab = item["codEstab"]
                 codProdE = item["codProdE"]
                 
-                precio2 = item["precio2"]
-                precio3 = item["precio3"]
+                #precio2 = item["precio2"]
+                #precio3 = item["precio3"]
                 
                 # 3.9
                 precio = item["precio1"]
@@ -179,6 +179,13 @@ class Digemid(Page):
                 # LABORATORIOS PORTUGAL S.R.L.
                 nombreLaboratorio = item["nombreLaboratorio"]
                 
+                #if "S/" in precio:
+                 #   try:
+                  #      precio = float(precio.replace('S/', ''))
+                   # except ValueError:
+                    #    precio = 0.0  # O asigna cualquier otro valor predeterminado que desees
+
+
                 product_id = unique_text(
                     nombreProducto, 
                     concent,
@@ -194,7 +201,7 @@ class Digemid(Page):
                     name =  codProdE,
                     presentation =  None,
                     brand = None,
-                    price =  f"S/{float(precio):.2f}",
+                    price =  f"{float(precio):.2f}",
                     source_information =  self.title,
                     lifting_date =  None,
                     laboratory =  nombreLaboratorio,
@@ -256,42 +263,40 @@ class Digemid(Page):
         }
 
         response_json = download_json(method="POST", url = url_post, headers=headers, data=payload)
-        if not response_json:
-            print(f"{self.title} : Hubo un error al obtener mas detalles del producto = {codigoProducto} - establecimiento {codEstablecimiento}")
-            return None
 
-        entity = response_json["entidad"]
-        if not entity:
-            print(f"{self.title} : Hubo un error al obtener mas detalles -> [entity] del producto = {codigoProducto} - establecimiento {codEstablecimiento}")
-            return None
-        
-        
-        try:
-            price = entity["precio1"]
-            name = entity["nombreProducto"]
-            laboratory = entity["laboratorio"]
-            presentation = entity["presentacion"]
-            farma = entity["nombreComercial"]
-                        
-            product = Product(
-                    id_sku = None,
-                    name =  name,
-                    presentation =  presentation,
-                    brand = None,
-                    price =  f"S/{float(price):.2f}",
-                    source_information =  f"{self.title}-{farma}",
-                    lifting_date =  None,
-                    laboratory =  laboratory,
-                    #card_discount =  f"Precio con todas las tarjetas: {price_with_payment_method} Precio Monedero del Ahorro: {price_all_payment_method}",
-                    card_discount = None,
-                    crossed_price =  None,
-                    suggested_comment =  None,
-                    description=None
-                )
-            return product
-            
-        except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer mas detalles en producto = {codigoProducto} - establecimiento {codEstablecimiento} -> {str(e)}")      
+        if response_json is not None:
+            #print("response: ", response_json) ------
 
-        
+            entity = response_json.get("entidad")
+            if entity is not None:
+                #print("Entidad: ", entity) -----
+                price = entity.get("precio1")
+                name = entity.get("nombreProducto")
+                laboratory = entity.get("laboratorio")
+                presentation = entity.get("presentacion")
+                farma = entity.get("nombreComercial")
+                ubigeo = entity.get("ubigeo")
+
+                #if "S/" in price:
+                  #  try:
+                   #     price = float(price.replace('S/', ''))
+                    #except ValueError:
+                     #   price = 0.0  # O asigna cualquier otro valor predeterminado que desees
+
+                product = Product(
+                        id_sku=ubigeo,
+                        name=name,
+                        presentation=presentation,
+                        brand=None,
+                        price=f"{float(price):.2f}",
+                        source_information=f"{self.title}",#-{farma}
+                        lifting_date=None,
+                        laboratory=laboratory,
+                        card_discount=None,
+                        crossed_price=None,
+                        suggested_comment=None,
+                        description=None
+                    )
+                return product
+
         return None
