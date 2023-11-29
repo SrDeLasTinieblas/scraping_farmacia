@@ -30,11 +30,15 @@ categories = digemid.get_categories()
 simbol_concantened = "¬"
 products_information_list = []
 min_required_products = 5
+simbol_concantened = "¬"
+products_information_list = []
+min_required_products = 5
+products_to_send = 50
+products_collected = 0
 
 print(categories)
 
-# Continuar hasta que se obtengan al menos 5 productos
-while len(products_information_list) < min_required_products:
+while True:
     # Recorrer cada categoría y obtener información de productos
     for category in categories:
         product_ids = digemid.get_product_urls(category)
@@ -47,20 +51,31 @@ while len(products_information_list) < min_required_products:
                     product_more_details = digemid.get_product_more_details(product)
                     if not product_more_details:
                         continue
+
                     # Cambié 'show_information' a 'show_information2' para que coincida con tu código anterior
                     product_information = product_more_details.show_information()
-                    
+
                     # Verificar si la información del producto no es None antes de agregarla a la lista
                     if product_information is not None:
                         products_information_list.append(product_information)
-                    else:
-                        print("La información del producto es None. Intentando otro producto.")
+                        products_collected += 1
 
-# Unir la lista de información de productos con el símbolo 'simbol_concantened'
-final_products_text = simbol_concantened.join(map(str, products_information_list))
-final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
-print(final_products_text)
-upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
+                        # Verificar si se han recolectado 1000 productos
+                        if products_collected % 1000 == 0:
+                            # Enviar productos a la base de datos en lotes de 50
+                            chunks = [products_information_list[i:i + products_to_send] for i in
+                                      range(0, len(products_information_list), products_to_send)]
+
+                            for chunk in chunks:
+                                final_products_text = simbol_concantened.join(map(str, chunk))
+                                final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
+                                print(final_products_text)
+                                upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
+
+                            # Limpiar la lista después de enviar los productos
+                            products_information_list = []
+
+# Fin del bucle
 
 
             
