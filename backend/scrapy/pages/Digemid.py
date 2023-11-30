@@ -29,7 +29,7 @@ class Digemid(Page):
             # Example : 3A OFTENO
             # Example : BENZOATO DE BENCILO 
             name_product = item["Nom_Prod"]
-            first_five_words = name_product[:5] 
+            first_five_words = name_product[:1] 
             first_five_words_list.append(first_five_words)
         
         first_five_words_list = list(set(first_five_words_list))  
@@ -135,7 +135,11 @@ class Digemid(Page):
     def get_product(self, product_id, resultados):   
         # El product_id que llega es  2926|120mg/5mL\t|24 
         item_tuple = hyphenated_string_to_tuple(product_id)
-        #resultados = self.obtenerParametros()
+        
+        IDDPTO = ""
+        IDPROV = ""      
+        
+        IDDIST = ""
         
         # Puedes acceder a los resultados de la siguiente manera
         for resultado in resultados:
@@ -147,69 +151,69 @@ class Digemid(Page):
             IDDPTO = int(IDDPTO)       
                  
             IDPROV = resultado['IDPROV']
-            IDDPTO = int(IDPROV)            
+            IDPROV = int(IDPROV)            
             
             IDDIST = resultado['IDDIST']
-            IDDPTO = int(IDDIST)
+            IDDIST = int(IDDIST)
 
-            
-                
-            product_code = item_tuple[0]
-            concent = item_tuple[1]
-            codGrupoFF = item_tuple[2]
-            
-            product_code = int(product_code)
-            url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/preciovista/ciudadano"
-
-            payload = json.dumps({
-            "filtro": {
-                "codigoProducto": product_code,
-                "codigoDepartamento": IDDPTO, #--
-                "codigoProvincia": IDPROV, #--
-                "codigoUbigeo": f"{resultado['IDDPTO'] + resultado['IDPROV'] + resultado['IDDIST']}",
-                "codTipoEstablecimiento": None,
-                "catEstablecimiento": None,
-                "nombreEstablecimiento": None,
-                "nombreLaboratorio": None,
-                "codGrupoFF": f"{codGrupoFF}",
-                "concent": f"{concent}",
-                "tamanio": 10,
-                "pagina": 1,
-                "tokenGoogle": "SiniurDeveloper",
-                "nombreProducto": None
-            }   
-            })
-            headers = {
-                'Accept': 'application/json, text/plain, */*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Content-Type': 'application/json',
-                'Origin': f"{self.url}",
-                'DNT': '1',
-                'Connection': 'keep-alive',
-                'Referer': f"{self.url}/",
-                'Sec-Fetch-Dest': 'empty',
-                'Sec-Fetch-Mode': 'cors',
-                'Sec-Fetch-Site': 'same-site',
-                'TE': 'trailers'
-            }
-
-            response_json = download_json(method="POST", url=url_post, headers=headers, data=payload)
-            
-            print(f"Se descargo el producto: {product_id}")
-
-            if not response_json:
-                #print(f"{self.title} : Hubo un error al descargar el producto = {product_id}")
-                return None
-            
-            data = response_json["data"]
-            if not data:
-                print(f"{self.title} : Hubo un error al obtener [data] en el producto = {product_id}")
-                return None
-            
-            products_dic = {}   
-            products = []
+        ##----
+             
+        product_code = item_tuple[0]
+        concent = item_tuple[1]
+        codGrupoFF = item_tuple[2]
         
+        product_code = int(product_code)
+        url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/preciovista/ciudadano"
+
+        payload = json.dumps({
+        "filtro": {
+            "codigoProducto": product_code,
+            "codigoDepartamento": IDDPTO, #--
+            "codigoProvincia": IDPROV, #--
+            "codigoUbigeo": f"{resultado['IDDPTO'] + resultado['IDPROV'] + resultado['IDDIST']}",
+            "codTipoEstablecimiento": None,
+            "catEstablecimiento": None,
+            "nombreEstablecimiento": None,
+            "nombreLaboratorio": None,
+            "codGrupoFF": f"{codGrupoFF}",
+            "concent": f"{concent}",
+            "tamanio": 10,
+            "pagina": 1,
+            "tokenGoogle": "SiniurDeveloper",
+            "nombreProducto": None
+        }   
+        })
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Content-Type': 'application/json',
+            'Origin': f"{self.url}",
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Referer': f"{self.url}/",
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-site',
+            'TE': 'trailers'
+        }
+
+        response_json = download_json(method="POST", url=url_post, headers=headers, data=payload)
+        
+        print(f"Se descargo el producto: {product_id}")
+
+        if not response_json:
+            #print(f"{self.title} : Hubo un error al descargar el producto = {product_id}")
+            return None
+        
+        data = response_json["data"]
+        if not data:
+            print(f"{self.title} : Hubo un error al obtener [data] en el producto = {product_id}")
+            return None
+        
+        products_dic = {}   
+        products = []
+    #--
         try:
             for item in data:
                 codEstab = item["codEstab"]
@@ -237,9 +241,9 @@ class Digemid(Page):
                 nombreLaboratorio = item["nombreLaboratorio"]
                 
                 #if "S/" in precio:
-                 #   try:
-                  #      precio = float(precio.replace('S/', ''))
-                   # except ValueError:
+                    #   try:
+                    #      precio = float(precio.replace('S/', ''))
+                    # except ValueError:
                     #    precio = 0.0  # O asigna cualquier otro valor predeterminado que desees
 
 
