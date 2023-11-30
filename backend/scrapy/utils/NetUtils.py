@@ -39,8 +39,9 @@ def download_page(url):
          
         response.raise_for_status()
         return response.text
+    
     except requests.exceptions.RequestException as e:
-        print(f"Error al descargar la página: {e}")
+        #print(f"Error al descargar la página: {e}")
         return None  
     
 

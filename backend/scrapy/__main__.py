@@ -22,6 +22,13 @@ from utils.UploadDatabase import upload_to_db
     
 """
 
+#digemid = Digemid()
+#resultados = digemid.obtenerParametros()
+
+
+#print(resultados)
+
+
 digemid = Digemid()
 
 
@@ -33,18 +40,21 @@ min_required_products = 5
 simbol_concantened = "¬"
 products_information_list = []
 min_required_products = 5
-products_to_send = 50
+products_to_send = 10 #50
 products_collected = 0
 
 print(categories)
+
+resultados = digemid.obtenerParametros()
 
 while True:
     # Recorrer cada categoría y obtener información de productos
     for category in categories:
         product_ids = digemid.get_product_urls(category)
         for product_id in product_ids[:1]:
-            products = digemid.get_product(product_id)
-            if len(products) >= 1:
+            products = digemid.get_product(product_id, resultados)
+            
+            if products is not None and len(products) >= 1:
                 print("Tamaño: ", len(products))
                 print("product_id: ", len(product_id))
                 for product in products:
@@ -52,7 +62,6 @@ while True:
                     if not product_more_details:
                         continue
 
-                    # Cambié 'show_information' a 'show_information2' para que coincida con tu código anterior
                     product_information = product_more_details.show_information()
 
                     # Verificar si la información del producto no es None antes de agregarla a la lista
@@ -61,7 +70,7 @@ while True:
                         products_collected += 1
 
                         # Verificar si se han recolectado 1000 productos
-                        if products_collected % 1000 == 0:
+                        if products_collected % 20 == 0:
                             # Enviar productos a la base de datos en lotes de 50
                             chunks = [products_information_list[i:i + products_to_send] for i in
                                       range(0, len(products_information_list), products_to_send)]
@@ -77,7 +86,11 @@ while True:
 
 # Fin del bucle
 
+ 
 
+
+ 
+ 
             
 """            
 for category in categories:
