@@ -353,8 +353,6 @@ class Digemid(Page):
                 catCodigo = entity.get("catCodigo")
                 email = entity.get("email")
                 ruc = entity.get("ruc")
-                codEstab = entity.get("codEstab")
-                
                 
 
                 #if "S/" in price:
