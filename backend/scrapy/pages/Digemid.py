@@ -1,5 +1,6 @@
 import json
-from model.Models import Product
+import traceback
+from model.Models import ProductDigimid, Product
 from pages.base.base import Page
 from bs4 import BeautifulSoup
 from utils.NetUtils import download_json, download_page
@@ -11,48 +12,27 @@ class Digemid(Page):
     
     def __init__(self, id = 6, title = "Digemid", url = "https://opm-digemid.minsa.gob.pe"):
         super().__init__(id, title, url)
+        
+
     
-    
-    def get_categories(self):           
-        categories = {}
-        url = decode_base64("aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL1NyRGVMYXNUaW5pZWJsYXMvTWluc2FfZGF0YS9tYWluL21pbnNhX3BoYXJtYWNldXRpY2FsX3Byb2R1Y3RzLmpzb24=")
-        categories[url] = "main"        
-        return categories
-    
-    def get_product_urls(self, category_url):
-        response_json = download_json(category_url)
+    # Paso 2 Autocompletado, hay que buscar :()
+    def step_2(self, product_name, product_concent):
+        search_word = product_name  
+        #print("search word: ", search_word)
+        url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/producto/autocompleteciudadano"
+        payload = json.dumps({
+        "filtro": {
+            "nombreProducto": f"{search_word}",
+            "pagina": 1,
+            "tamanio": 10,
+            "tokenGoogle": ""
+        }
+        })
         
-        # 1) Del Json obtener los nombres del producto "Nom_Prod" -> Ejemplo = DAVINTEX 120
-        
-        first_five_words_list = []
-        for item in response_json:
-            # Example : 3A OFTENO
-            # Example : BENZOATO DE BENCILO 
-            name_product = item["Nom_Prod"]
-            first_five_words = name_product[:1] 
-            first_five_words_list.append(first_five_words)
-        
-        first_five_words_list = list(set(first_five_words_list))  
-       
-        
-        request_data_dic = {}
-        
-        
-        for first_five_words in first_five_words_list[:10]:
-            search_word = first_five_words  
-                      
-            url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/producto/autocompleteciudadano"
-            payload = json.dumps({
-            "filtro": {
-                "nombreProducto": f"{search_word}",
-                "pagina": 1,
-                "tamanio": 10,
-                "tokenGoogle": ""
-            }
-            })
-            
-            # base url = https://opm-digemid.minsa.gob.pe
-            headers = {
+        # base url = https://opm-digemid.minsa.gob.pe
+        # User-Agent
+	
+        headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/119.0',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'en-US,en;q=0.5',
@@ -66,35 +46,40 @@ class Digemid(Page):
             'Sec-Fetch-Mode': 'cors',
             'Sec-Fetch-Site': 'same-site',
             'TE': 'trailers'
-            }
+        }
+        
+        response_json = download_json(url =url_post, method="POST", headers=headers, data=payload)
+        if not response_json:
+           print(f"step_2 repsonse json null")
+           return None
+        
+        data = response_json["data"]
+        if not data:
+           print(f"step_2 repsonse not data")
+           return None
             
-            response_json = download_json(url =url_post, method="POST", headers=headers, data=payload)
-            if not response_json:
-                continue
+        key_products = {}        
             
-            data = response_json["data"]
-            if not data:
-                continue
+        # Fix Made Fack
+        product_concent = product_concent.replace(" ", "")    
+        for item in data:                
+            grupo = item["grupo"]
+            concent = item["concent"]
+            codGrupoFF = item["codGrupoFF"] 
             
-            for item in data:                
-                grupo = item["grupo"]
-                concent = item["concent"]
-                codGrupoFF = item["codGrupoFF"]  
-                             
-                """
-                    El id se forma asi grupo|concent|codGrupoFF
-                    Ejemplo =           2926|120mg/5mL\t|24
-                    
-                """                        
-                original_tuple = (grupo, concent, codGrupoFF)
-                build_id = tuple_to_hyphenated_string(original_tuple)
-                request_data_dic[build_id] = original_tuple
+            if product_concent == concent:
+                key_product = {
+                    "grupo": grupo,
+                    "concent" : concent,
+                    "codGrupoFF" : codGrupoFF 
+                }
+                key_products[f"{grupo}{concent}{codGrupoFF}"] = key_product
+        
+        key_products_list = key_products.values()
+        key_products_list = list(key_products_list)
+        return key_products_list          
+            
          
-        product_ids = [] 
-        for key, truple_data in request_data_dic.items():            
-            product_ids.append(key)                 
-                                    
-        return product_ids           
     
     def obtenerParametros(self):
 
@@ -118,8 +103,8 @@ class Digemid(Page):
             # Obtiene los resultados como una lista de diccionarios
             resultados = [dict(zip(column_names, row)) for row in cursor.fetchall()]
 
-            for resultado in resultados:
-                print(resultado)
+            #for resultado in resultados:
+            #    print(resultado)
 
         except Exception as e:
             print(f"Error: {e}")
@@ -131,60 +116,38 @@ class Digemid(Page):
 
         return resultados
            
-                            
-    def get_product(self, product_id, resultados):   
-        # El product_id que llega es  2926|120mg/5mL\t|24 
-        item_tuple = hyphenated_string_to_tuple(product_id)
-        
-        IDDPTO = ""
-        IDPROV = ""      
-        
-        IDDIST = ""
-        
-        # Puedes acceder a los resultados de la siguiente manera
-        
-        for resultado in resultados:
-            #print(resultado['IDDPTO'])
-            #print(resultado['IDPROV'])
-            #print(resultado['IDDIST'])
-            
-            IDDPTO = resultado['IDDPTO']
-            IDDPTO = int(IDDPTO)       
-                 
-            IDPROV = resultado['IDPROV']
-            IDPROV = int(IDPROV)            
-            
-            IDDIST = resultado['IDDIST']
-            IDDIST = int(IDDIST)
-        
-        ##----
-             
-        product_code = item_tuple[0]
-        concent = item_tuple[1]
-        codGrupoFF = item_tuple[2]
+              
+    # Paso 3                        
+    def step_3(self, key_group, key_concent, key_codGrupoFF, departament_id, province_id, ubigeo_id):   
+       
+                      
+        product_code = key_group
+        concent = key_concent
+        codGrupoFF = key_codGrupoFF
         
         product_code = int(product_code)
         url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/preciovista/ciudadano"
 
         payload = json.dumps({
         "filtro": {
-            "codigoProducto": product_code,
-            "codigoDepartamento": IDDPTO, #--
-            "codigoProvincia": IDPROV, #--
-            "codigoUbigeo": f"{resultado['IDDPTO'] + resultado['IDPROV'] + resultado['IDDIST']}",
-            "codTipoEstablecimiento": None,
-            "catEstablecimiento": None,
-            "nombreEstablecimiento": None,
-            "nombreLaboratorio": None,
-            "codGrupoFF": f"{codGrupoFF}",
-            "concent": f"{concent}",
-            "tamanio": 10,
-            "pagina": 1,
-            "tokenGoogle": "SiniurDeveloper",
-            "nombreProducto": None
-        }   
+                "codigoProducto": product_code,
+                "codigoDepartamento": f"{departament_id}",
+                "codigoProvincia": f"{province_id}",
+                "codigoUbigeo": f"{ubigeo_id}",
+                "codTipoEstablecimiento": None,
+                "catEstablecimiento": None,
+                "nombreEstablecimiento": None,
+                "nombreLaboratorio": None,
+                "codGrupoFF": f"{codGrupoFF}",
+                "concent": f"{concent}",
+                "tamanio": 10,
+                "pagina": 1,
+                "tokenGoogle": "SiniurDeveloper",
+                "nombreProducto": None
+            }
         })
         headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/119.0',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'en-US,en;q=0.5',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -201,22 +164,23 @@ class Digemid(Page):
 
         response_json = download_json(method="POST", url=url_post, headers=headers, data=payload)
         
+        
         if not response_json:
-            #print(f"{self.title} : Hubo un error al descargar el producto = {product_id}")
-            return None
-        else:
-            print(f"Se descargo el producto: {product_id}")
-
+            #print(f"{self.title} : Hubo un error al descargar el producto")
+            return None         
+        
         data = response_json["data"]
         if not data:
-            #print(f"{self.title} : Hubo un error al obtener [data] en el producto = {product_id}")
+            #print(f"{self.title} : Hubo un error al obtener [data] en el producto")
             return None
         
         products_dic = {}   
         products = []
-    #--
+        
         try:
             for item in data:
+                #print(f"\nitem ----> {item}\n")
+            
                 codEstab = item["codEstab"]
                 codProdE = item["codProdE"]
                 
@@ -242,9 +206,9 @@ class Digemid(Page):
                 nombreLaboratorio = item["nombreLaboratorio"]
                 
                 #if "S/" in precio:
-                    #   try:
-                    #      precio = float(precio.replace('S/', ''))
-                    # except ValueError:
+                 #   try:
+                  #      precio = float(precio.replace('S/', ''))
+                   # except ValueError:
                     #    precio = 0.0  # O asigna cualquier otro valor predeterminado que desees
 
 
@@ -263,7 +227,7 @@ class Digemid(Page):
                     name =  codProdE,
                     presentation =  None,
                     brand = None,
-                    price =  f"{float(precio):.2f}",
+                    price = f"{float(precio):.2f}" if f"{float(precio):.2f}" else None,
                     source_information =  self.title,
                     lifting_date =  None,
                     laboratory =  nombreLaboratorio,
@@ -279,22 +243,19 @@ class Digemid(Page):
                     codigoProducto":53725,"         ====> codProdE  ====> name
                     codEstablecimiento":"0053974"   ====> codEstab  ====> id_sku
                 """
-            
-            print(f"Producto descargado: {codProdE}")
-
+        
         except Exception as e:
-            #print(f"{self.title} : Hubo un error al extraer datos en {product_id} -> {str(e)}")   
-            return None   
+            #print(f"{self.title} : Hubo un error al extraer datos en -> {str(e)}")      
+            return None
+        
 
-        for key, product in products_dic.items():            
-                products.append(product)        
-    
+        for key, product in products_dic.items():    
+            products.append(product)      
     
     
         return products if products else None
     
-    
-    def get_product_more_details(self, product, resultados):
+    def step_4(self, product):
         """
             For next call need data
             codigoProducto":53725,"         ====> codProdE  ====> name
@@ -313,6 +274,7 @@ class Digemid(Page):
         }
         })
         headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/119.0',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'en-US,en;q=0.5',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -329,73 +291,97 @@ class Digemid(Page):
 
         response_json = download_json(method="POST", url = url_post, headers=headers, data=payload)
         
+        if not response_json:
+            print("response_json is None")
+            return None
+
+        #print(f"response_json {response_json}")                
+        entity = response_json.get("entidad")
+        
+        if not entity:
+            print("entity is None")
+            return None
+        
+        
+        try:           
+            precio1 = entity.get("precio1")
+            precio2 = entity.get("precio2")
+            nombreProducto = entity.get("nombreProducto")
+            paisFabricacion = entity.get("paisFabricacion")
+            registroSanitario = entity.get("registroSanitario")
+            condicionVenta = entity.get("condicionVenta")
+            tipoProducto = entity.get("tipoProducto")
+            nombreTitular = entity.get("nombreTitular")
+            nombreFabricante = entity.get("nombreFabricante")
+            presentacion = entity.get("presentacion")
+            laboratorio = entity.get("laboratorio")
+            directorTecnico = entity.get("directorTecnico")
+            nombreComercial = entity.get("nombreComercial")
+            telefono = entity.get("telefono")
+            direccion = entity.get("direccion")
+            departamento = entity.get("departamento")
+            provincia = entity.get("provincia")
+            distrito = entity.get("distrito")
+            horarioAtencion = entity.get("horarioAtencion")
+            ubigeo = entity.get("ubigeo")
+            catCodigo = entity.get("catCodigo")
+            email = entity.get("email")
+            ruc = entity.get("ruc")
+            
+
+            #if "S/" in price:
+              #  try:
+               #     price = float(price.replace('S/', ''))
+                #except ValueError:
+                 #   price = 0.0  # O asigna cualquier otro valor predeterminado que desees
+
+            #print(f"precio1 {precio1} - precio2 {precio2}")
+            
+            if not precio1:
+               precio1 = None
+            else:    
+               precio1 = f"{float(precio1):.2f}"
+               
+            if not precio2:
+               precio2 = None
+            else:    
+               precio2 = f"{float(precio2):.2f}"  
+               
+            
+            product = ProductDigimid(
+                id_sku=ubigeo,
+                ubigeo = ubigeo,
+                nombre_producto=nombreProducto,
+                presentacion=presentacion,
+                precio1= precio1,                  
+                precio2= precio2,
+                pais_fabricacion=paisFabricacion,
+                registro_sanitario=registroSanitario,
+                condicion_venta=condicionVenta,
+                tipo_producto=tipoProducto,
+                nombre_titular=nombreTitular,
+                nombre_fabricante=nombreFabricante,
+                laboratorio=laboratorio,
+                director_tecnico=directorTecnico,
+                nombre_comercial=nombreComercial,
+                telefono=telefono,
+                direccion=direccion,
+                departamento=departamento,
+                provincia=provincia,
+                distrito=distrito,
+                horario_atencion=horarioAtencion,
+                cat_codigo=catCodigo,
+                email=email,
+                ruc=ruc,
+                cod_establecimiento = codEstablecimiento
+                )
+            return product
+        except Exception as e: 
+            print(f"{self.title} : Hubo al parsear [entity] -> {str(e)}") 
+            traceback.print_exc()     
 
         
+        
+            
+        return None    
 
-        if response_json is not None:
-            #print("response: ", response_json) ------
-
-            entity = response_json.get("entidad")
-            if entity is not None:
-                #print("Entidad: ", entity) -----
-                precio1 = entity.get("precio1")
-                precio2 = entity.get("precio2")
-                nombreProducto = entity.get("nombreProducto")
-                paisFabricacion = entity.get("paisFabricacion")
-                registroSanitario = entity.get("registroSanitario")
-                condicionVenta = entity.get("condicionVenta")
-                tipoProducto = entity.get("tipoProducto")
-                nombreTitular = entity.get("nombreTitular")
-                nombreFabricante = entity.get("nombreFabricante")
-                presentacion = entity.get("presentacion")
-                laboratorio = entity.get("laboratorio")
-                directorTecnico = entity.get("directorTecnico")
-                nombreComercial = entity.get("nombreComercial")
-                telefono = entity.get("telefono")
-                direccion = entity.get("direccion")
-                departamento = entity.get("departamento")
-                provincia = entity.get("provincia")
-                distrito = entity.get("distrito")
-                horarioAtencion = entity.get("horarioAtencion")
-                ubigeo = entity.get("ubigeo")
-                catCodigo = entity.get("catCodigo")
-                email = entity.get("email")
-                ruc = entity.get("ruc")
-                
-
-                #if "S/" in price:
-                  #  try:
-                   #     price = float(price.replace('S/', ''))
-                    #except ValueError:
-                     #   price = 0.0  # O asigna cualquier otro valor predeterminado que desees
-
-                product = Product(
-                    id_sku=ubigeo,
-                    name=nombreProducto,
-                    presentation=presentacion,
-                    brand=None,
-                    price1=f"{float(precio1):.2f}",
-                    precio2=f"{float(precio2):.2f}",
-                    pais_fabricacion=paisFabricacion,
-                    registro_sanitario=registroSanitario,
-                    condicion_venta=condicionVenta,
-                    tipo_producto=tipoProducto,
-                    nombre_titular=nombreTitular,
-                    nombre_fabricante=nombreFabricante,
-                    laboratorio=laboratorio,
-                    director_tecnico=directorTecnico,
-                    nombre_comercial=nombreComercial,
-                    telefono=telefono,
-                    direccion=direccion,
-                    departamento=departamento,
-                    provincia=provincia,
-                    distrito=distrito,
-                    horario_atencion=horarioAtencion,
-                    cat_codigo=catCodigo,
-                    email=email,
-                    ruc=ruc,
-                    codEstablecimiento = codEstablecimiento
-                    )
-                return product
-
-        return None

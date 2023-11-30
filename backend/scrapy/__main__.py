@@ -32,28 +32,88 @@ from utils.UploadDatabase import upload_to_db
 digemid = Digemid()
 
 
-categories = digemid.get_categories()
-
 simbol_concantened = "¬"
 products_information_list = []
 min_required_products = 5
-simbol_concantened = "¬"
-products_information_list = []
-min_required_products = 5
-products_to_send = 10 #50
-products_collected = 0
 
-print(categories)
+products_to_send = 50 
+
 
 resultados = digemid.obtenerParametros()
 
+products_digimid = []
+
+for resultado in resultados:
+    #print(f"resultado -><- {resultado}")
+    nombre_de_product = resultado['PROD_NOMBRE']
+    departamento_id = resultado['IDDPTO']                 
+    provincia_id = resultado['IDPROV']
+    distrito_id = resultado['IDDIST']
+    ubigeo_id = f"{departamento_id}{provincia_id}{distrito_id}"
+    concentracion = resultado['PROD_CONCENTRACION']
+    
+    key_productos = digemid.step_2(product_name=nombre_de_product, product_concent=concentracion)
+    if not key_productos:
+        continue
+    
+    for key_producto in key_productos:
+        #print(f"key_producto ->>>> {key_producto}")
+        key_grupo = key_producto["grupo"]
+        key_concent = key_producto["concent"]
+        key_codGrupoFF = key_producto["codGrupoFF"]         
+
+        products = digemid.step_3(key_group=key_grupo, 
+                                 key_concent = key_concent,
+                                 key_codGrupoFF = key_codGrupoFF,
+                                 departament_id = departamento_id,
+                                 province_id = provincia_id,
+                                 ubigeo_id= ubigeo_id
+                            )
+        if not products:
+            continue
+        
+        for product in products:
+            if not product:
+                continue
+            
+            internal_product = digemid.step_4(product)            
+            if not internal_product:
+                print(f"error en internal_products")
+                continue
+            products_digimid.append(internal_product)
+            #internal_product.show_information2()
+            #print(internal_product.show_information()) 
+            #print("\n")  
+            
+
+# Número deseado de elementos por sublista
+elementos_por_sublista = products_to_send
+# Divide la lista en sublistas de 50 elementos
+sublistas = [products_digimid[i:i+elementos_por_sublista] for i in range(0, len(products_digimid), elementos_por_sublista)]
+
+# Imprime o utiliza las sublistas según tus necesidades
+# Esto es cada 50
+for i, sublista in enumerate(sublistas):
+    products_text = []
+    for product in sublista:
+        products_text.append(product.show_information())    
+    
+    final_products_text = simbol_concantened.join(products_text)
+    final_products_text = f"{digemid.id}¯{final_products_text}"
+    # Enviar a Sensei
+    print(final_products_text)   
+
+     
+     
+
+"""
 while True:
     # Recorrer cada categoría y obtener información de productos
     for category in categories:
         product_ids = digemid.get_product_urls(category)
         # Iterar sobre los product_ids y obtener los productos
         for product_id in product_ids:
-            products = digemid.get_product(product_id, resultados)
+            products = digemid.get_product(product_id)
 
             # Verificar si se descargaron productos correctamente
             if products:
@@ -93,14 +153,11 @@ while True:
                             products_information_list = []
 
 # Fin del bucle
-
+"""
  
 
-
- 
- 
             
-"""            
+"""
 for category in categories:
     product_ids = digemid.get_product_urls(category)
 
