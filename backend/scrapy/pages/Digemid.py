@@ -142,6 +142,7 @@ class Digemid(Page):
         IDDIST = ""
         
         # Puedes acceder a los resultados de la siguiente manera
+        
         for resultado in resultados:
             #print(resultado['IDDPTO'])
             #print(resultado['IDPROV'])
@@ -155,7 +156,7 @@ class Digemid(Page):
             
             IDDIST = resultado['IDDIST']
             IDDIST = int(IDDIST)
-
+        
         ##----
              
         product_code = item_tuple[0]
@@ -200,15 +201,15 @@ class Digemid(Page):
 
         response_json = download_json(method="POST", url=url_post, headers=headers, data=payload)
         
-        print(f"Se descargo el producto: {product_id}")
-
         if not response_json:
             #print(f"{self.title} : Hubo un error al descargar el producto = {product_id}")
             return None
-        
+        else:
+            print(f"Se descargo el producto: {product_id}")
+
         data = response_json["data"]
         if not data:
-            print(f"{self.title} : Hubo un error al obtener [data] en el producto = {product_id}")
+            #print(f"{self.title} : Hubo un error al obtener [data] en el producto = {product_id}")
             return None
         
         products_dic = {}   
@@ -293,7 +294,7 @@ class Digemid(Page):
         return products if products else None
     
     
-    def get_product_more_details(self, product):
+    def get_product_more_details(self, product, resultados):
         """
             For next call need data
             codigoProducto":53725,"         ====> codProdE  ====> name
@@ -327,6 +328,9 @@ class Digemid(Page):
         }
 
         response_json = download_json(method="POST", url = url_post, headers=headers, data=payload)
+        
+
+        
 
         if response_json is not None:
             #print("response: ", response_json) ------

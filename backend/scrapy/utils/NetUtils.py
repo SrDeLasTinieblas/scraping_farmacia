@@ -63,7 +63,7 @@ def download_json(url, method = "GET", headers = {}, data = {}):
         response = requests.request(method = method, url = url, headers=my_headers, data=my_payload)   
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Error al descargar la página {url} : {e}")
+        #print(f"Error al descargar la página {url} : {e}")
         return None    
     
   

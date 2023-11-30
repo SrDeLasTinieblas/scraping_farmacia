@@ -51,9 +51,17 @@ while True:
     # Recorrer cada categoría y obtener información de productos
     for category in categories:
         product_ids = digemid.get_product_urls(category)
-        for product_id in product_ids[:1]:
+        # Iterar sobre los product_ids y obtener los productos
+        for product_id in product_ids:
             products = digemid.get_product(product_id, resultados)
-            
+
+            # Verificar si se descargaron productos correctamente
+            if products:
+                print(f"Se descargaron {len(products)} productos para el ID: {product_id}")
+                # Puedes hacer más cosas con la lista de productos si es necesario
+            #else:
+                #print(f"No se descargaron productos para el ID: {product_id}")
+                
             if products is not None and len(products) >= 1:
                 print("Tamaño: ", len(products))
                 print("product_id: ", len(product_id))
