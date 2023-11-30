@@ -353,7 +353,7 @@ class Digemid(Page):
                 catCodigo = entity.get("catCodigo")
                 email = entity.get("email")
                 ruc = entity.get("ruc")
-                ruc = entity.get("ruc")
+                codEstab = entity.get("codEstab")
                 
                 
 
