@@ -16,6 +16,19 @@ class Digemid(Page):
     
     # Paso 2 Autocompletado, hay que buscar :()
     def step_2(self, product_name, product_concent):
+        """
+        The `step_2` function takes a product name and concentration as input, sends a POST request to a
+        specific URL with the payload containing the search parameters, and returns a list of key products
+        that match the given concentration.
+        
+        :param product_name: The product_name parameter is the name of the product you want to search for
+        :param product_concent: The parameter "product_concent" represents the concentration of the product.
+        It is used in the "step_2" function to filter the search results based on the concentration of the
+        product
+        :return: The function `step_2` returns a list of dictionaries containing information about the
+        products that match the given `product_name` and `product_concent`. Each dictionary in the list
+        represents a product and includes the following keys: "grupo", "concent", and "codGrupoFF".
+        """
         search_word = product_name  
         #print("search word: ", search_word)
         url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/producto/autocompleteciudadano"
@@ -81,6 +94,13 @@ class Digemid(Page):
          
     
     def obtenerParametros(self):
+        """
+        The function `obtenerParametros` connects to a SQL Server database, executes a stored procedure,
+        retrieves the results as a list of dictionaries, and returns the results.
+        :return: the results obtained from executing the stored procedure
+        "uspOperacionesConsultaDigemidItems" in the database. The results are returned as a list of
+        dictionaries, where each dictionary represents a row in the result set.
+        """
 
         server = '154.53.44.5\SQLEXPRESS'
         database = 'BDCOMPRESOFT'
@@ -88,9 +108,11 @@ class Digemid(Page):
         password = 'Tecn0farm@3102'
     
         conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-    
+
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
+
+        resultados = []
 
         try:
             # Ejecuta el procedimiento almacenado
@@ -102,8 +124,8 @@ class Digemid(Page):
             # Obtiene los resultados como una lista de diccionarios
             resultados = [dict(zip(column_names, row)) for row in cursor.fetchall()]
 
-            #for resultado in resultados:
-            #    print(resultado)
+            # for resultado in resultados:
+            #    print("==>" + resultado)
 
         except Exception as e:
             print(f"Error: {e}")
@@ -117,9 +139,34 @@ class Digemid(Page):
            
               
     # Paso 3                        
-    def step_3(self, key_group, key_concent, key_codGrupoFF, departament_id, province_id, ubigeo_id):   
-       
-                      
+    def step_3(self, key_group, key_concent,nombre_producto, key_codGrupoFF):   
+        """
+        The function `step_3` takes in several parameters, makes a POST
+        request to a specific URL with the given payload, and extracts data
+        from the response to create a list of Product objects.
+        
+        :param key_group: The key_group parameter is used to specify the code
+        of the product group. It is expected to be an integer value
+        :param key_concent: The parameter "key_concent" is used to specify the
+        concentration of the product. It is a key that represents the
+        concentration value of the product
+        :param key_codGrupoFF: The parameter "key_codGrupoFF" is used to
+        specify the code of the product group. It is used in the API request
+        to filter the products based on their group
+        :param departament_id: The `departament_id` parameter represents the
+        code for the department (or region) where the product is being
+        searched for. It is used to filter the search results based on the
+        specified department
+        :param province_id: The parameter "province_id" is used to specify the
+        code of the province for which you want to retrieve data. It is used
+        in the API request to filter the results based on the specified
+        province
+        :param ubigeo_id: The `ubigeo_id` parameter is used to specify the
+        code for a specific location in Peru. It is a unique identifier for a
+        geographical area and is used to filter the search results for
+        products in that particular location
+        :return: a list of Product objects.
+        """     
         product_code = key_group
         concent = key_concent
         codGrupoFF = key_codGrupoFF
@@ -130,9 +177,9 @@ class Digemid(Page):
         payload = json.dumps({
         "filtro": {
                 "codigoProducto": product_code,
-                "codigoDepartamento": f"{departament_id}",
-                "codigoProvincia": f"{province_id}",
-                "codigoUbigeo": f"{ubigeo_id}",
+                "codigoDepartamento": None,
+                "codigoProvincia": None,
+                "codigoUbigeo": None,
                 "codTipoEstablecimiento": None,
                 "catEstablecimiento": None,
                 "nombreEstablecimiento": None,
@@ -142,7 +189,7 @@ class Digemid(Page):
                 "tamanio": 10,
                 "pagina": 1,
                 "tokenGoogle": "SiniurDeveloper",
-                "nombreProducto": None
+                "nombreProducto": f"{nombre_producto}"
             }
         })
         headers = {
@@ -170,7 +217,7 @@ class Digemid(Page):
         
         data = response_json["data"]
         if not data:
-            print(f"{self.title} : Hubo un error al obtener [data] en el producto")
+            #print(f"{self.title} : Hubo un error al obtener [data] en el producto {key_group}")
             return None
         
         products_dic = {}   
@@ -204,7 +251,6 @@ class Digemid(Page):
                 # LABORATORIOS PORTUGAL S.R.L.
                 nombreLaboratorio = item["nombreLaboratorio"]
                 
-
                 product_id = unique_text(
                     nombreProducto, 
                     concent,
@@ -218,7 +264,7 @@ class Digemid(Page):
                 products_dic[product_id] = Product(
                     id_sku = codEstab,
                     name =  codProdE,
-                    presentation =  None,
+                    presentation =  concent,
                     brand = None,
                     price = f"{float(precio):.2f}" if f"{float(precio):.2f}" else None,
                     source_information =  self.title,
@@ -256,6 +302,7 @@ class Digemid(Page):
         """
         codigoProducto = int(product.name)
         codEstablecimiento = f"{product.id_sku}" 
+        key_concent = f"{product.presentation}" 
         
         url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/precioproducto/obtener"
 
@@ -292,7 +339,7 @@ class Digemid(Page):
         entity = response_json.get("entidad")
         
         if not entity:
-            print("entity is None")
+            #print("entity is None")
             return None
         
         
@@ -310,12 +357,12 @@ class Digemid(Page):
             laboratorio = entity.get("laboratorio")
             directorTecnico = entity.get("directorTecnico")
             nombreComercial = entity.get("nombreComercial")
-            telefono = entity.get("telefono")
-            direccion = entity.get("direccion")
+            #telefono = entity.get("telefono")
+            #direccion = entity.get("direccion")
             #departamento = entity.get("departamento")
             #provincia = entity.get("provincia")
             #distrito = entity.get("distrito")
-            horarioAtencion = entity.get("horarioAtencion")
+            #horarioAtencion = entity.get("horarioAtencion")
             ubigeo = entity.get("ubigeo")
             catCodigo = entity.get("catCodigo")
             email = entity.get("email")
@@ -332,14 +379,17 @@ class Digemid(Page):
             else:    
                precio2 = f"{float(precio2):.2f}"  
                
-            
-            if '--' in horarioAtencion:
-                horarioAtencion = horarioAtencion.replace('--', 'y')
-            
+            #if '--' in direccion:
+             #   direccion = direccion.replace('--', ' ')
+                
+            #if '--' in telefono:
+             #   telefono = telefono.replace('--', ' ')
+                #
             product = ProductDigimid(
                 #id_sku=ubigeo,
                 ubigeo = ubigeo,
-                nombre_producto=nombreProducto,
+                nombre_producto=nombreProducto + " " + key_concent,
+                concentracion=key_concent,
                 presentacion=presentacion,
                 precio1= precio1,                  
                 precio2= precio2,
@@ -352,12 +402,12 @@ class Digemid(Page):
                 laboratorio=laboratorio,
                 director_tecnico=directorTecnico,
                 nombre_comercial=nombreComercial,
-                telefono=telefono,
-                direccion=direccion,
+                #telefono=telefono,
+                #direccion=direccion,
                 #departamento=departamento,
                 #provincia=provincia,
                 #distrito=distrito,
-                horario_atencion=horarioAtencion,
+                #horario_atencion=horarioAtencion,
                 cat_codigo=catCodigo,
                 email=email,
                 ruc=ruc,

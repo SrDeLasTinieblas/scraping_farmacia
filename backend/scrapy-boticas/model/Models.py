@@ -21,8 +21,26 @@ class Product:
             self.crossed_price = crossed_price
             self.suggested_comment = suggested_comment
             self.description = description
+            
+            
+        '''
+        def __init__(self, id_sku, name, tomaaldia, concentracion, presentation, brand, price, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment, description):
+            self.id_sku = id_sku
+            self.name = name
+            self.tomaaldia = tomaaldia
+            self.concentracion = concentracion
+            self.presentation = presentation
+            self.brand = brand
+            self.price = price
+            self.source_information = source_information
+            self.lifting_date = lifting_date
+            self.laboratory = laboratory
+            self.card_discount = card_discount
+            self.crossed_price = crossed_price
+            self.suggested_comment = suggested_comment
+            self.description = description
+        '''
         
-      
         def show_information2(self):
                 print("Product Information:")
                 print(f"\tSKU: {self.id_sku}")
@@ -43,7 +61,12 @@ class Product:
         def show_information(self):
             # Convierte el objeto Product a una cadena en el formato deseado
             return f"{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
-                
+        
+        '''
+        def show_information(self):
+            # Convierte el objeto Product a una cadena en el formato deseado
+            return f"{self.id_sku}|{self.name}|{self.tomaaldia}{self.concentracion}|{self.presentation}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
+        '''
         
 '''
         print("\t\t"+self.description)

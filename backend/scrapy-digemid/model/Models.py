@@ -44,23 +44,17 @@ class Product:
             # Convierte el objeto Product a una cadena en el formato deseado
             return f"{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
                 
-        
-'''
-        print("\t\t"+self.description)
-        print("\tImages:")
-        for image in self.images:
-            print("\t\t"+ image)
-'''
       
 class ProductDigimid:
     
-        def __init__(self, precio1, precio2, nombre_producto, pais_fabricacion, registro_sanitario, condicion_venta, tipo_producto, nombre_titular, nombre_fabricante,
-                     presentacion, laboratorio, director_tecnico, nombre_comercial, telefono, direccion, 
-                     horario_atencion, ubigeo, cat_codigo, email, ruc, cod_establecimiento):
+        def __init__(self, precio1, precio2, nombre_producto, concentracion, pais_fabricacion, registro_sanitario, condicion_venta, tipo_producto, nombre_titular, nombre_fabricante,
+                     presentacion, laboratorio, director_tecnico, nombre_comercial, 
+                     ubigeo, cat_codigo, email, ruc, cod_establecimiento):
             #self.id_sku = id_sku
             self.precio1 = precio1
             self.precio2 = precio2
             self.nombre_producto = nombre_producto
+            self.concentracion = concentracion
             self.pais_fabricacion = pais_fabricacion
             self.registro_sanitario = registro_sanitario
             self.condicion_venta = condicion_venta
@@ -71,12 +65,12 @@ class ProductDigimid:
             self.laboratorio = laboratorio
             self.director_tecnico = director_tecnico
             self.nombre_comercial = nombre_comercial
-            self.telefono = telefono
-            self.direccion = direccion
+            #self.telefono = telefono
+            #self.direccion = direccion
             #self.departamento = departamento
             #self.provincia = provincia
             #self.distrito = distrito
-            self.horario_atencion = horario_atencion
+            #self.horario_atencion = horario_atencion
             self.ubigeo = ubigeo
             self.cat_codigo = cat_codigo
             self.email = email
@@ -100,12 +94,12 @@ class ProductDigimid:
                 print(f"Laboratorio: {self.laboratorio}")
                 print(f"Director técnico: {self.director_tecnico}")
                 print(f"Nombre comercial: {self.nombre_comercial}")
-                print(f"Teléfono: {self.telefono}")
-                print(f"Dirección: {self.direccion}")
+                #print(f"Teléfono: {self.telefono}")
+                #print(f"Dirección: {self.direccion}")
                 #print(f"Departamento: {self.departamento}")
                 #print(f"Provincia: {self.provincia}")
                 #print(f"Distrito: {self.distrito}")
-                print(f"Horario de atención: {self.horario_atencion}")
+                #print(f"Horario de atención: {self.horario_atencion}")
                 print(f"Ubigeo: {self.ubigeo}")
                 print(f"Código CAT: {self.cat_codigo}")
                 print(f"Correo electrónico: {self.email}")
@@ -116,18 +110,10 @@ class ProductDigimid:
         
         
         def show_information(self):
-                return f"{self.precio1}|{self.precio2}|{self.nombre_producto}|{self.pais_fabricacion}|{self.registro_sanitario}|{self.condicion_venta}|{self.tipo_producto}|{self.nombre_titular}|{self.nombre_fabricante}|{self.presentacion}|{self.laboratorio}|{self.director_tecnico}|{self.nombre_comercial}|{self.telefono}|{self.direccion}|{self.horario_atencion}|{self.ubigeo}|{self.cat_codigo}|{self.email}|{self.ruc}|{self.cod_establecimiento}"
+                return f"{self.precio1}|{self.precio2}|{self.nombre_producto}|{self.concentracion}|{self.pais_fabricacion}|{self.registro_sanitario}|{self.condicion_venta}|{self.tipo_producto}|{self.nombre_titular}|{self.nombre_fabricante}|{self.presentacion}|{self.laboratorio}|{self.director_tecnico}|{self.nombre_comercial}|{self.ubigeo}|{self.cat_codigo}|{self.email}|{self.ruc}|{self.cod_establecimiento}"
 
                 
-        
-'''
-        print("\t\t"+self.description)
-        print("\tImages:")
-        for image in self.images:
-            print("\t\t"+ image)
-'''        
 
-        
 
 
 
