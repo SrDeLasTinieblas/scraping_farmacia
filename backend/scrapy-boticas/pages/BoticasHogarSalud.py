@@ -20,7 +20,6 @@ class BoticasHogarSalud(Page):
             href = element.find('a')["href"] 
             if href and href.startswith(f"{self.url}/c/"):
                 category_urls.append(href)
-                print("href", href)
 
         all_products_urls = []  # Almacena todos los enlaces de productos de todas las categorías
         

@@ -333,9 +333,6 @@ class Digemid(Page):
                precio2 = f"{float(precio2):.2f}"  
                
             
-            if '--' in horarioAtencion:
-                horarioAtencion = horarioAtencion.replace('--', 'y')
-            
             product = ProductDigimid(
                 #id_sku=ubigeo,
                 ubigeo = ubigeo,

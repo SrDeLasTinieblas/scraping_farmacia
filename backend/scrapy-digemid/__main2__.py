@@ -1,15 +1,6 @@
 import random
-import time
-from pages.FarmaUniversal import FarmaUniversal
-from pages.Inkafarma import Inkafarma
-from pages.BoticasSalud import BoticasSalud
-from pages.BoticasPeru import BoticasPeru
-from pages.HogarSalud import HogarSalud
-from pages.MiFarmaX import MiFarma
+from time import time
 from pages.Digemid import Digemid
-from model.Models import Product
-from utils.NetUtils import download_page, get_random_user_agent
-import concurrent.futures
 from utils.UploadDatabase import upload_to_db
 
 """
@@ -22,93 +13,60 @@ from utils.UploadDatabase import upload_to_db
     
 """
 
-#digemid = Digemid()
-#resultados = digemid.obtenerParametros()
-
-
-#print(resultados)
-
 
 digemid = Digemid()
-
 
 simbol_concantened = "¬"
 products_information_list = []
 min_required_products = 5
-products_to_send = 5
+products_to_send = 50  # Número de productos a enviar a la base de datos por lote
+products_collected = 0  # Inicializar el contador de productos recolectados
 
-total_productos_enviados = 0  # Variable para realizar un seguimiento del total de productos enviados
+print(categories)
 
+while True:
+    # Recorrer cada categoría y obtener información de productos
+    for category in categories:
+        product_ids = digemid.get_product_urls(category)
+        for product_id in product_ids[:1]:
+            products = digemid.get_product(product_id)
+            if len(products) >= 1:
+                print("Tamaño: ", len(products))
+                print("product_id: ", len(product_id))
+                for product in products:
+                    product_more_details = digemid.get_product_more_details(product)
+                    if not product_more_details:
+                        continue
 
-resultados = digemid.obtenerParametros()
+                    # Cambié 'show_information' a 'show_information2' para que coincida con tu código anterior
+                    product_information = product_more_details.show_information()
 
-products_digimid = []
+                    # Verificar si la información del producto no es None antes de agregarla a la lista
+                    if product_information is not None:
+                        products_information_list.append(product_information)
+                        products_collected += 1
 
-for resultado in resultados:
-    #print(f"resultado -><- {resultado}")
-    nombre_de_product = resultado['PROD_NOMBRE']
-    departamento_id = resultado['IDDPTO']                 
-    provincia_id = resultado['IDPROV']
-    distrito_id = resultado['IDDIST']
-    ubigeo_id = f"{departamento_id}{provincia_id}{distrito_id}"
-    concentracion = resultado['PROD_CONCENTRACION']
-    
-    key_productos = digemid.step_2(product_name=nombre_de_product, product_concent=concentracion)
-    if not key_productos:
-        continue
-    
-    for key_producto in key_productos:
-        #print(f"key_producto ->>>> {key_producto}")
-        key_grupo = key_producto["grupo"]
-        key_concent = key_producto["concent"]
-        key_codGrupoFF = key_producto["codGrupoFF"]         
+                        # Verificar si se han recolectado 1000 productos
+                        if products_collected % 1000 == 0:
+                            # Enviar productos a la base de datos en lotes de 50
+                            chunks = [products_information_list[i:i + products_to_send] for i in
+                                      range(0, len(products_information_list), products_to_send)]
 
-        products = digemid.step_3(key_group=key_grupo, 
-                                 key_concent = key_concent,
-                                 key_codGrupoFF = key_codGrupoFF,
-                                 departament_id = departamento_id,
-                                 province_id = provincia_id,
-                                 ubigeo_id= ubigeo_id
-                            )
-        if not products:
-            continue
-        
-        for product in products:
-            if not product:
-                continue
-            
-            internal_product = digemid.step_4(product)            
-            if not internal_product:
-                print(f"error en internal_products")
-                continue
-            products_digimid.append(internal_product)
-            #internal_product.show_information2()
-            #print(internal_product.show_information()) 
-            #print("\n")  
-            
+                            for chunk in chunks:
+                                # Acumular los textos de los productos en una lista
+                                products_text = [product.show_information() for product in chunk]
 
-elementos_por_sublista = products_to_send
-sublistas = [products_digimid[i:i+elementos_por_sublista] for i in range(0, len(products_digimid), elementos_por_sublista)]
+                                # Unir los textos de los productos con el símbolo 'simbol_concantened'
+                                final_products_text = simbol_concantened.join(products_text)
+                                final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
+                                print(final_products_text)
+                                # upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
 
+                            # Limpiar la lista después de enviar los productos
+                            products_information_list = []
 
-# Esto es cada 50
-for i, sublista in enumerate(sublistas):
-    products_text = []
-    for product in sublista:
-        products_text.append(product.show_information())
+# Fin del bucle
 
-    final_products_text = simbol_concantened.join(products_text)
-    final_products_text = f"{digemid.id}¯{final_products_text}"
-    
-    # Envía a la base de datos y actualiza el total
-    total_productos_enviados += len(sublista)
-    upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
-    print(final_products_text)
-    #print(f"Productos enviados hasta ahora: {total_productos_enviados}")
-    
-print(f"Total de productos enviados al final: {total_productos_enviados}")
-     
-     
 
 """
 while True:
