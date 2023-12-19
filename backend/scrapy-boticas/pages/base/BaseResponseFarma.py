@@ -57,7 +57,7 @@ class BaseResponseFarma(Page):
             "brandsFilter":[],
             "ranking":"null",
             "page":0,
-            "rows":8,
+            "rows":2000,
             "order":"ASC",
             "sort": "ranking",
             "productsFilter": [ ]
@@ -85,28 +85,30 @@ class BaseResponseFarma(Page):
             'TE': 'trailers'
         }
                     
-        response_data = download_json(url = url, method="POST", headers=headers, data=payload)
-            
-        print("response: ", response_data)
+        # Realizar la primera petición
+        response_data = download_json(url=url, method="POST", headers=headers, data=payload)
         
-        if not response_data:
-           print(f"{self.title} : Hubo un error al descargar category = {category_id}")
-           return None
-        
-
-        try: 
+        try:
+            total = response_data.get("total", 0)
             products_id_row = []
-            products_name = []
-            rows = response_data["rows"]#["data"]
-            #print("rows: ", rows)
-            for row in rows:
-                id_row = row["id"]
-                name = row["name"]
-                if name:
-                    products_id_row.append(id_row)             
-                    products_name.append(name)             
-            
-            return products_id_row  
+
+            # Realizar las solicitudes adicionales según el valor de "total"
+            for _ in range(total):
+                # Realizar la solicitud
+                response_data = download_json(url=url, method="POST", headers=headers, data=payload)
+                if response_data is None:
+                    print("La respuesta es None. Saltando a la siguiente iteración.")
+                    continue
+
+                rows = response_data.get("rows", [])
+                for row in rows:
+                    id_row = row.get("id")
+                    name = row.get("name")
+                    if name:
+                        products_id_row.append(id_row)
+
+            return products_id_row
+        
         except Exception as e: 
             print(f"{self.title} : Hubo un error al extraer datos en {category_id} -> {str(e)}")      
 

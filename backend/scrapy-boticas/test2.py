@@ -150,7 +150,7 @@ def scrape_selected_pages(selected_pags):
             final_products_text = simbol_concantened.join(product_texts)
             final_products_text = f"{botica.id}¯{final_products_text}" #{simbol_concantened}"
             print(final_products_text)       
-            #upload_to_db(final_products_text)
+            upload_to_db(final_products_text)
 
 
 # Obtener las páginas disponibles
