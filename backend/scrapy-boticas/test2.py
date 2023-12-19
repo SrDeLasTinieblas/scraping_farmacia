@@ -18,6 +18,11 @@ def get_category_and_product_info(botica):
     categories = botica.get_categories()
     total_categories = len(categories)
     print(f"Tamaño de categorías en {botica.name}: {total_categories}")
+    
+    #if botica.name == 'Farmacia Universal':
+      #  selected_categories_boticas_universal = get_selected_categories(categories, lambda category: category.name)
+    #if botica.name == 'Inkafarma':
+     #   selected_categories_inkafarma = get_selected_categories(categories, lambda category: category["name"])
 
     # Preguntar al usuario qué categorías quiere scrapear
     selected_categories = get_selected_categories(categories)
@@ -36,17 +41,6 @@ def get_category_and_product_info(botica):
 
     return selected_categories, total_products
 
-"""
-def get_selected_categories(all_categories):
-    questions = [
-        inquirer.Checkbox('categories',
-                          message='Selecciona las categorías para el scraping:',
-                          choices=[(category.name, category) for category in all_categories])
-    ]
-    answers = inquirer.prompt(questions)
-    selected_categories = answers.get('categories', [])
-    return selected_categories
-"""
 
 def get_selected_categories(all_categories):
     questions = [
@@ -58,6 +52,49 @@ def get_selected_categories(all_categories):
     selected_categories = answers.get('categories', [])
     return selected_categories
 
+
+# Uso para Boticas Universal
+#selected_categories_boticas_universal = get_selected_categories(all_categories_boticas_universal, lambda category: category.name)
+
+# Uso para Inkafarma
+#selected_categories_inkafarma = get_selected_categories(all_categories_inkafarma, lambda category: category["name"])
+
+
+"""
+
+
+def get_selected_categories(all_categories, map_function):
+    questions = [
+        inquirer.Checkbox('categories',
+                          message='Selecciona las categorías para el scraping:',
+                          choices=[(map_function(category), category) for category in all_categories])
+    ]
+    answers = inquirer.prompt(questions)
+    selected_categories = answers.get('categories', [])
+    return selected_categories
+    
+
+def get_selected_categories(all_categories):
+    questions = [
+        inquirer.Checkbox('categories',
+                          message='Selecciona las categorías para el scraping:',
+                          choices=[(category.name, category) for category in all_categories])
+    ]
+    answers = inquirer.prompt(questions)
+    selected_categories = answers.get('categories', [])
+    return selected_categories
+
+
+def get_selected_categories(all_categories):
+    questions = [
+        inquirer.Checkbox('categories',
+                          message='Selecciona las categorías para el scraping:',
+                          choices=[(category["name"], category) for category in all_categories])
+    ]
+    answers = inquirer.prompt(questions)
+    selected_categories = answers.get('categories', [])
+    return selected_categories
+"""
 
 def download_product(botica, product_url):
     try:
@@ -92,7 +129,7 @@ def scrape_selected_pages(selected_pags):
         products_black_list = []
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(download_product, botica, product_url) for category_url in categories for product_url in botica.get_product_urls(category_url)]#[:2]]
+            futures = [executor.submit(download_product, botica, product_url) for category_url in categories for product_url in botica.get_product_urls(category_url)]
 
             for future in concurrent.futures.as_completed(futures):
                 product_url, products_internal = future.result()
@@ -106,26 +143,15 @@ def scrape_selected_pages(selected_pags):
         simbol_concantened = "¬"
         chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
 
+        # Recorrer los trozos
         for chunk in chunks:
             product_texts = [product_internal.show_information() for product_internal in chunk]
+            
             final_products_text = simbol_concantened.join(product_texts)
-            final_products_text = f"{botica.id}¯{final_products_text}{simbol_concantened}"
+            final_products_text = f"{botica.id}¯{final_products_text}" #{simbol_concantened}"
+            print(final_products_text)       
+            #upload_to_db(final_products_text)
 
-            server = '154.53.44.5\SQLEXPRESS'
-            database = 'BDCOMPRESOFT'
-            username = 'userTecnofarma'
-            password = 'Tecn0farm@3102'
-
-            conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-            try:
-                with pyodbc.connect(conn_str) as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("{CALL uspOperacionesMovimientosImportarFarmaciasCSV (?)}", (final_products_text))
-                    print(final_products_text)
-            except pyodbc.Error as ex:
-                sqlstate = ex.args[0]
-                errormsg = ex.args[1]
-                print(f"Error de SQL Server: SQLState - {sqlstate}, ErrorMessage - {errormsg}")
 
 # Obtener las páginas disponibles
 pages_with_categories = [

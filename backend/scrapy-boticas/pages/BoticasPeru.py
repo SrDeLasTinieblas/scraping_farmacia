@@ -17,7 +17,8 @@ class BoticasPeru(Page):
                
         #categorys = []
         
-        categories = {}
+        #categories_url = {}
+        categories = []
         
         soup = BeautifulSoup(html, 'html.parser')
         if soup:
@@ -30,9 +31,12 @@ class BoticasPeru(Page):
                     title_value = first_a_element.find_all('span')[0].text
                     # print("title_value", title_value)
                     if href_value:
-                        categories[href_value] = title_value
+                        #categories[href_value] = title_value
+                        #categories.append(Page(name=title_value, value=title_value))
+                        categories.append({"id": href_value, "name": title_value})
+
                         #categorys.append(href_value)               
-            
+        print("categories: ", categories)
         return categories
     
     
@@ -47,7 +51,7 @@ class BoticasPeru(Page):
             while is_equals:
                 conter += 1
                 
-                final_category_url =  f"{category_url}?p={conter}"
+                final_category_url =  f"{category_url["id"]}?p={conter}"
                 #print(f"Pag :: {final_category_url}")
                 products_url_internal = []
                 
@@ -100,7 +104,7 @@ class BoticasPeru(Page):
         
         html = download_page(url_product)
         if not html:
-            print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
+            #print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
             return None
         
         products = []

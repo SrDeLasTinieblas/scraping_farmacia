@@ -13,8 +13,9 @@ class BoticasSalud(Page):
 
     def get_categories(self):
         
-        categories = {}
-        
+        #categories = {}
+        categories = []
+
         url = "https://bys-prod-backend.azurewebsites.net/api/ServiceCategory"
         response_data = download_json(url)
         data = response_data["data"]
@@ -22,12 +23,14 @@ class BoticasSalud(Page):
         for category in data:
             slug = category["slug"]
             title = category["title"]
-            categories[slug] = title
+            #categories[slug] = title
             #category_slugs.append(slug)
+            categories.append({"id": slug, "name": title})
+
         return categories
     
     def get_product_urls(self, category_slug):
-        url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug}&filterBy=2&CurrentPage=1&PageSize=1"
+        url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug["id"]}&filterBy=2&CurrentPage=1&PageSize=1"
         response_data = download_json(url)
         if not response_data:
             #print(f"{self.title} : Hubo un error al descargar category = {category_slug}")
@@ -35,7 +38,7 @@ class BoticasSalud(Page):
         
         try:
             total_items = response_data["data"]["totalItems"]
-            url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug}&filterBy=2&CurrentPage=1&PageSize={total_items}"
+            url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug["id"]}&filterBy=2&CurrentPage=1&PageSize={total_items}"
             response_data = download_json(url)
             
             products_slug = []
@@ -49,7 +52,7 @@ class BoticasSalud(Page):
             return products_slug 
         
         except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer datos en {category_slug} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_slug["id"]} -> {str(e)}")      
 
         return None
            

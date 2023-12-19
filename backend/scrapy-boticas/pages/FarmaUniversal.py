@@ -27,12 +27,15 @@ class FarmaUniversal(Page):
             if href.startswith('productos'):
                 title = link.find("b").text
                 href = f"{self.url}/{href}"
-                categories.append(Page(name=title, value=href))
+                #categories.append(Page(name=title, value=href))
+                
+                categories.append({"id": href, "name": title})
 
+        print("categories: ", categories)
         return categories
 
     def get_product_urls(self, category_url):
-        category_url = category_url.value
+        category_url = category_url["id"]
         category_id = None
         product_urls = []
         

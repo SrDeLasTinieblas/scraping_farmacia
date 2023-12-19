@@ -14,11 +14,11 @@ from pages.HogarSalud import HogarSalud
 from utils.UploadDatabase import upload_to_db
 
 boticas = [
-    BoticasPeru(),      # si envia  ---
+    #BoticasPeru(),      # si envia  ---
     #BoticasSalud(),    # si envia  ---
     #HogarSalud(),       # si envia ---
     #FarmaUniversal(),  # si envia  ---
-    #Inkafarma()        # si envia
+    Inkafarma()        # si envia
     
     #MiFarma()
 ]

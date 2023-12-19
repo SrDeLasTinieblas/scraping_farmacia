@@ -35,28 +35,32 @@ class BaseResponseFarma(Page):
         for item in data:   
             category_id = item["id"]
             category_name = item["name"]
+            #categories.append({"id": category_id, "name": category_name})
             categories.append({"id": category_id, "name": category_name})
-                            
+
+        print("category_url: ", category_url)        
+        print("categories: ", categories)              
         return categories
 
     
     def get_product_urls(self, category_id):
         
+        #url = f"https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/{self.code_farma}/filtered-products?companyCode={self.code_company}&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
         url = f"https://5doa19p9r7.execute-api.us-east-1.amazonaws.com/{self.code_farma}/filtered-products?companyCode={self.code_company}&saleChannel=WEB&saleChannelType=DIGITAL&sourceDevice=null"
         
         payload = json.dumps({
             "departmentsFilter": [
-                category_id
+                category_id["id"]
             ],
-            "categoriesFilter": [],
-            "subcategoriesFilter": [],
-            "brandsFilter": [],
-            "ranking": None,
-            "page": 0,
-            "rows": 135,
-            "order": "ASC",
+            "categoriesFilter":[ ],
+            "subcategoriesFilter":[],
+            "brandsFilter":[],
+            "ranking":"null",
+            "page":0,
+            "rows":8,
+            "order":"ASC",
             "sort": "ranking",
-            "productsFilter": []
+            "productsFilter": [ ]
             })
         
             #print("post::.", post_url)
