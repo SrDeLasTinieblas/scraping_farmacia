@@ -6,7 +6,7 @@ from utils.NetUtils import download_page
 
 class HogarSalud(Page):
     
-    def __init__(self, id = 5, title = "Hogar y Salud", url = "https://www.hogarysalud.com.pe/"):
+    def __init__(self, id = 5, title = "Hogar y Salud", url = "https://www.hogarysalud.com.pe"):
         super().__init__(id, title, url)
         self.name = title  # Agregar el atributo 'name'
 
@@ -16,7 +16,8 @@ class HogarSalud(Page):
             html = download_page(self.url)
             soup = BeautifulSoup(html, 'html.parser')
             
-            categories = {}
+            categories = []
+            category = {}
             elements_menu_item = soup.find_all('li', id=lambda x: x and x.startswith('menu-item-'))
 
             for element in elements_menu_item:
@@ -25,10 +26,11 @@ class HogarSalud(Page):
                     href = a_element.get("href", "")
                     if href.startswith(f"{self.url}/c/"):
                         title_element = a_element.find('span', class_='nav-link-text')
-                        print("title_element: ", title_element)
+                        #print("title_element: ", title_element)
                         if title_element:
                             title = title_element.text
-                            categories[href] = title
+                            category[href] = title
+                            categories.append({"id": href, "name": title })
 
             return categories
 
@@ -102,14 +104,14 @@ class HogarSalud(Page):
                         
             while is_not_error:
                 conter += 1  # Aumenta el contador en cada iteración
-                final_category_url = category_url
+                final_category_url = category_url["id"]
                         # https://www.hogarysalud.com.pe/c/salud-y-bienestar/?per_page=100
                         # https://www.hogarysalud.com.pe/c/salud-y-bienestar/page/2/?per_page=100
                         
                 if conter == 1:
-                    final_category_url = f"{category_url}?per_page=36"
+                    final_category_url = f"{category_url["id"]}?per_page=36"
                 elif conter >= 2:
-                    final_category_url = f"{category_url}page/{conter}/?per_page=36"
+                    final_category_url = f"{category_url["id"]}page/{conter}/?per_page=36"
                     
                 #print(f"Pag :: {final_category_url}")
                 html = download_page(final_category_url)
@@ -130,7 +132,7 @@ class HogarSalud(Page):
 
             return products_url             
         except Exception as e: 
-            print(f"{self.title} : Hubo un error al extraer datos en {category_url} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_url["id"]} -> {str(e)}")      
 
         return None            
         

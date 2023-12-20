@@ -32,6 +32,7 @@ def get_category_and_product_info(botica):
 
     #for category_url in tqdm(selected_categories, desc="Obteniendo productos", unit="categoría"):
     for category_url in selected_categories:
+        #print("category_url: ", category_url)
         total_products += len(botica.get_product_urls(category_url))
 
     print(f"Tamaño total de productos en {botica.name}: {total_products}")
@@ -107,7 +108,7 @@ def scrape_selected_pages(selected_pags):
     boticas_instances = {
         "https://www.boticasysalud.com/": BoticasSalud(),
         "https://boticasperu.pe/": BoticasPeru(),
-        "https://www.hogarysalud.com.pe/": HogarSalud(),
+        "https://www.hogarysalud.com.pe": HogarSalud(),
         "https://farmaciauniversal.com/": FarmaUniversal(),
         "https://inkafarma.pe/": Inkafarma(),
         # Agrega más instancias según sea necesario
@@ -157,7 +158,7 @@ def scrape_selected_pages(selected_pags):
 pages_with_categories = [
     Page(name="Botica Salud", value="https://www.boticasysalud.com/"),
     Page(name="Botica Peru", value="https://boticasperu.pe/"),
-    Page(name="Hogar y Salud", value="https://www.hogarysalud.com.pe/"),
+    Page(name="Hogar y Salud", value="https://www.hogarysalud.com.pe"),
     Page(name="Farmacia Universal", value="https://farmaciauniversal.com/"),
     Page(name="Inkafarma", value="https://inkafarma.pe/"),
     # Agrega más instancias según sea necesario
