@@ -23,10 +23,10 @@ def upload_to_db(text_upload):
     
 
     
-    server = '154.53.44.5\SQLEXPRESS'
-    database = 'BDCOMPRESOFT'
-    username = 'userTecnofarma'
-    password = 'Tecn0farm@3102'
+    server = 'DESKTOP-N5GCHST\SQLEXPRESS'
+    database = 'farmacia'
+    username = ''
+    password = ''
     
     
     conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'

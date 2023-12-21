@@ -1,7 +1,9 @@
 import random
 from time import time
+import traceback
 from pages.Digemid import Digemid
 from utils.UploadDatabase import upload_to_db
+import pyodbc
 
 """
     Farmacia Universal  = 1
@@ -14,59 +16,137 @@ from utils.UploadDatabase import upload_to_db
 """
 
 
-digemid = Digemid()
+def chunks(lst, chunk_size):
+    """Divide la lista en bloques del tamaño especificado."""
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
 
-simbol_concantened = "¬"
-products_information_list = []
-min_required_products = 5
-products_to_send = 50  # Número de productos a enviar a la base de datos por lote
-products_collected = 0  # Inicializar el contador de productos recolectados
+def connect_to_database(server, database, username, password):
+    """Establece la conexión a la base de datos."""
+    conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
+    conn = pyodbc.connect(conn_str)
+    cursor = conn.cursor()
+    return conn, cursor
 
-print(categories)
+def upload_to_db(cursor, text_upload):
+    """Sube productos a la base de datos."""
+    try:
+        cursor.execute("{CALL uspOperacionesMovimientosImportarDIGEMIDCSV (?)}", (text_upload))
+        cursor.commit()
+        return True 
+    except Exception as e:
+        print(f"Error al cargar en la base de datos: {str(e)}")
+        traceback.print_exc()
+        return False
+    
+    
+    
+    
+def upload_to_db_bulk_transaction(cursor, products):
+    """Sube productos a la base de datos en bloques usando transacción."""
+    try:
+        cursor.execute("BEGIN TRANSACTION;")
 
-while True:
-    # Recorrer cada categoría y obtener información de productos
-    for category in categories:
-        product_ids = digemid.get_product_urls(category)
-        for product_id in product_ids[:1]:
-            products = digemid.get_product(product_id)
-            if len(products) >= 1:
-                print("Tamaño: ", len(products))
-                print("product_id: ", len(product_id))
+        # Asegúrate de que el tipo de datos coincida con el procedimiento almacenado
+        cursor.executemany("{CALL uspOperacionesMovimientosImportarDIGEMIDCSV (?)}", [(str(product[0]),) for product in products])
+
+        cursor.execute("COMMIT;")
+        return True 
+    except Exception as e:
+        print(f"Error al cargar en la base de datos: {str(e)}")
+        traceback.print_exc()
+        cursor.execute("ROLLBACK;")
+        return False
+
+
+    
+
+
+def main():
+    digemid = Digemid()
+    simbol_concantened = "¬"
+    total_productos_enviados = 0  
+    resultados = digemid.obtenerParametros()
+    products_digimid = []
+    tiempo_inicial = time()
+    nombre_de_product = ""
+
+    print("Tamaño de productos a obtener:", len(resultados))
+
+    if len(resultados) > 0:
+        for resultado in resultados:
+            print(f"resultado -><- {resultado}")
+            nombre_de_product = resultado['PROD_NOMBRE']
+            concentracion = resultado['PROD_CONCENTRACION']
+            
+            key_productos = digemid.step_2(product_name=nombre_de_product, product_concent=concentracion)
+            if not key_productos:
+                continue
+            
+            for key_producto in key_productos:
+                key_grupo = key_producto["grupo"]
+                key_concent = key_producto["concent"]
+                key_codGrupoFF = key_producto["codGrupoFF"]  
+
+                products = digemid.step_3(key_group=key_grupo, 
+                                        key_concent=key_concent,
+                                        nombre_producto=nombre_de_product,
+                                        key_codGrupoFF=key_codGrupoFF
+                                    )
+                if not products:
+                    continue
+                
                 for product in products:
-                    product_more_details = digemid.get_product_more_details(product)
-                    if not product_more_details:
+                    if not product:
                         continue
+                    
+                    internal_product = digemid.step_4(product)            
+                    if not internal_product:
+                        continue
+                    products_digimid.append(internal_product)
+                
+    products_text = [product.show_information() for product in products_digimid]
+    final_products_text = simbol_concantened.join(products_text)
+    final_products_text_with_prefix = f"6¯{final_products_text}"
 
-                    # Cambié 'show_information' a 'show_information2' para que coincida con tu código anterior
-                    product_information = product_more_details.show_information()
+    total_productos_enviados = len(products_digimid)
 
-                    # Verificar si la información del producto no es None antes de agregarla a la lista
-                    if product_information is not None:
-                        products_information_list.append(product_information)
-                        products_collected += 1
+    # Conectar a la base de datos
+    server = '154.53.44.5\SQLEXPRESS'
+    database = 'BDCOMPRESOFT'
+    username = 'userTecnofarma'
+    password = 'Tecn0farm@3102'
+    
+    conn, cursor = connect_to_database(server, database, username, password)
 
-                        # Verificar si se han recolectado 1000 productos
-                        if products_collected % 1000 == 0:
-                            # Enviar productos a la base de datos en lotes de 50
-                            chunks = [products_information_list[i:i + products_to_send] for i in
-                                      range(0, len(products_information_list), products_to_send)]
+    
+    product_chunks = list(chunks(products_digimid, 50))
 
-                            for chunk in chunks:
-                                # Acumular los textos de los productos en una lista
-                                products_text = [product.show_information() for product in chunk]
+    count = 0
+    for chunk in product_chunks:
+        final_products_text = simbol_concantened.join([product.show_information() for product in chunk])
+        final_products_text_with_prefix = f"6¯{final_products_text}"
 
-                                # Unir los textos de los productos con el símbolo 'simbol_concantened'
-                                final_products_text = simbol_concantened.join(products_text)
-                                final_products_text = f"{digemid.id}¯{final_products_text}{simbol_concantened}"
-                                print(final_products_text)
-                                # upload_to_db(final_products_text)  # Descomenta esta línea cuando estés listo para enviar a la base de datos
+        #products_to_upload = [(final_products_text_with_prefix,) for _ in chunk]
 
-                            # Limpiar la lista después de enviar los productos
-                            products_information_list = []
+        count += 1
+        upload_to_db(cursor, final_products_text_with_prefix)
+        #upload_to_db_bulk_transaction(cursor, products_to_upload)
 
-# Fin del bucle
+        with open(f"product_chunks {count}.txt", "w", encoding="utf-8") as file:
+            file.write(final_products_text_with_prefix + "\n")
 
+    print(f"Total de productos enviados al final: {total_productos_enviados}")
+    tiempo_final = time()
+    tiempo_total = tiempo_final - tiempo_inicial
+    print("Tiempo total de ejecución: {} segundos".format(tiempo_total))
+
+    
+    conn.close()
+
+if __name__ == "__main__":
+    main()
+    
 
 """
 while True:
