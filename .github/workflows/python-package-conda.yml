@@ -38,4 +38,4 @@ jobs:
           Write-Host "Commit message does not contain the required keyword. Skipping execution."
         }
 
-        
+            
