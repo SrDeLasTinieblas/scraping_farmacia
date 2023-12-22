@@ -17,50 +17,46 @@ import pyodbc
 
 
 def chunks(lst, chunk_size):
-    """Divide la lista en bloques del tamaño especificado."""
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
 def connect_to_database(server, database, username, password):
-    """Establece la conexión a la base de datos."""
     conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
     conn = pyodbc.connect(conn_str)
     cursor = conn.cursor()
     return conn, cursor
 
-def upload_to_db(cursor, text_upload):
-    """Sube productos a la base de datos."""
+def upload_to_db(text_upload):
+    server = '154.53.44.5\SQLEXPRESS'
+    database = 'BDCOMPRESOFT'
+    username = 'userTecnofarma'
+    password = 'Tecn0farm@3102'
+    
     try:
-        cursor.execute("{CALL uspOperacionesMovimientosImportarDIGEMIDCSV (?)}", (text_upload))
-        cursor.commit()
-        return True 
+        nombreSP = 'uspOperacionesMovimientosImportarDIGEMIDCSV'
+        parametroNombre = 'DATA'
+        conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
+
+        con = pyodbc.connect(conn_str)
+        #cmd = con.cursor()
+        
+        sql = "exec {0} @{1}=?".format(nombreSP, parametroNombre)
+        cursor = con.execute(sql, (text_upload))
+        #respuesta = cursor.fetchval()
+        con.commit()
+        cursor.close()
+        
+        return True
     except Exception as e:
-        print(f"Error al cargar en la base de datos: {str(e)}")
+        print(f"Error de base de datos: {str(e)}")
         traceback.print_exc()
         return False
-    
-    
-    
-    
-def upload_to_db_bulk_transaction(cursor, products):
-    """Sube productos a la base de datos en bloques usando transacción."""
-    try:
-        cursor.execute("BEGIN TRANSACTION;")
-
-        # Asegúrate de que el tipo de datos coincida con el procedimiento almacenado
-        cursor.executemany("{CALL uspOperacionesMovimientosImportarDIGEMIDCSV (?)}", [(str(product[0]),) for product in products])
-
-        cursor.execute("COMMIT;")
-        return True 
-    except Exception as e:
-        print(f"Error al cargar en la base de datos: {str(e)}")
-        traceback.print_exc()
-        cursor.execute("ROLLBACK;")
-        return False
-
-
-    
-
+"""
+def medirTiempo(tiempo_inicial, tiempo_mensaje):
+    tiempo_final = time()
+    tiempo_total = tiempo_final - tiempo_inicial
+    print("Tiempo {0}: {1} segundos".format(tiempo_mensaje, tiempo_total))
+"""
 
 def main():
     digemid = Digemid()
@@ -68,18 +64,20 @@ def main():
     total_productos_enviados = 0  
     resultados = digemid.obtenerParametros()
     products_digimid = []
-    tiempo_inicial = time()
     nombre_de_product = ""
-
     print("Tamaño de productos a obtener:", len(resultados))
+    #tiempo_inicio = time()
+    tiempo_inicial = time()
+
 
     if len(resultados) > 0:
         for resultado in resultados:
-            print(f"resultado -><- {resultado}")
+            #print(f"resultado -><- {resultado}")
             nombre_de_product = resultado['PROD_NOMBRE']
             concentracion = resultado['PROD_CONCENTRACION']
-            
+            #tiempo_inicial = time()
             key_productos = digemid.step_2(product_name=nombre_de_product, product_concent=concentracion)
+            #medirTiempo(tiempo_inicial, "digemid.step_2")
             if not key_productos:
                 continue
             
@@ -87,20 +85,22 @@ def main():
                 key_grupo = key_producto["grupo"]
                 key_concent = key_producto["concent"]
                 key_codGrupoFF = key_producto["codGrupoFF"]  
-
+                #tiempo_inicial = time()
                 products = digemid.step_3(key_group=key_grupo, 
                                         key_concent=key_concent,
                                         nombre_producto=nombre_de_product,
                                         key_codGrupoFF=key_codGrupoFF
                                     )
+                #medirTiempo(tiempo_inicial, "digemid.step_3")
                 if not products:
                     continue
                 
                 for product in products:
                     if not product:
                         continue
-                    
-                    internal_product = digemid.step_4(product)            
+                    #tiempo_inicial = time()
+                    internal_product = digemid.step_4(product)    
+                    #medirTiempo(tiempo_inicial, "digemid.step_4")        
                     if not internal_product:
                         continue
                     products_digimid.append(internal_product)
@@ -110,39 +110,33 @@ def main():
     final_products_text_with_prefix = f"6¯{final_products_text}"
 
     total_productos_enviados = len(products_digimid)
+    #medirTiempo(tiempo_inicio, "total de scraping")
 
-    # Conectar a la base de datos
-    server = '154.53.44.5\SQLEXPRESS'
-    database = 'BDCOMPRESOFT'
-    username = 'userTecnofarma'
-    password = 'Tecn0farm@3102'
-    
-    conn, cursor = connect_to_database(server, database, username, password)
-
-    
+    #tiempo_inicial = time()
     product_chunks = list(chunks(products_digimid, 50))
 
     count = 0
     for chunk in product_chunks:
+        
         final_products_text = simbol_concantened.join([product.show_information() for product in chunk])
         final_products_text_with_prefix = f"6¯{final_products_text}"
-
-        #products_to_upload = [(final_products_text_with_prefix,) for _ in chunk]
-
+        lista = final_products_text.split(simbol_concantened)
+        #nRegistros = len(lista)
         count += 1
-        upload_to_db(cursor, final_products_text_with_prefix)
-        #upload_to_db_bulk_transaction(cursor, products_to_upload)
+        
+        upload_to_db(final_products_text_with_prefix)
+        #print("nRegistros: ", nRegistros)
+        #print("respuesta {0}: {1}".format(count, respuesta))
 
-        with open(f"product_chunks {count}.txt", "w", encoding="utf-8") as file:
-            file.write(final_products_text_with_prefix + "\n")
+        #with open(f"product_chunks {count}.txt", "w", encoding="utf-8") as file:
+         #   file.write(final_products_text_with_prefix + "\n")
 
     print(f"Total de productos enviados al final: {total_productos_enviados}")
+    #medirTiempo(tiempo_inicial, "digemid db")        
+
     tiempo_final = time()
     tiempo_total = tiempo_final - tiempo_inicial
     print("Tiempo total de ejecución: {} segundos".format(tiempo_total))
-
-    
-    conn.close()
 
 if __name__ == "__main__":
     main()

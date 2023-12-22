@@ -1,4 +1,5 @@
 import json
+from time import time
 import traceback
 from model.Models import ProductDigimid, Product
 from pages.base.base import Page
@@ -16,19 +17,6 @@ class Digemid(Page):
     
     # Paso 2 Autocompletado, hay que buscar :()
     def step_2(self, product_name, product_concent):
-        """
-        The `step_2` function takes a product name and concentration as input, sends a POST request to a
-        specific URL with the payload containing the search parameters, and returns a list of key products
-        that match the given concentration.
-        
-        :param product_name: The product_name parameter is the name of the product you want to search for
-        :param product_concent: The parameter "product_concent" represents the concentration of the product.
-        It is used in the "step_2" function to filter the search results based on the concentration of the
-        product
-        :return: The function `step_2` returns a list of dictionaries containing information about the
-        products that match the given `product_name` and `product_concent`. Each dictionary in the list
-        represents a product and includes the following keys: "grupo", "concent", and "codGrupoFF".
-        """
         search_word = product_name  
         #print("search word: ", search_word)
         url_post = "https://ms-opm.minsa.gob.pe/msopmcovid/producto/autocompleteciudadano"
@@ -72,7 +60,7 @@ class Digemid(Page):
             
         key_products = {}        
             
-        # Fix Made Fack
+        
         product_concent = product_concent.replace(" ", "")    
         for item in data:                
             grupo = item["grupo"]
@@ -94,13 +82,6 @@ class Digemid(Page):
          
     
     def obtenerParametros(self):
-        """
-        The function `obtenerParametros` connects to a SQL Server database, executes a stored procedure,
-        retrieves the results as a list of dictionaries, and returns the results.
-        :return: the results obtained from executing the stored procedure
-        "uspOperacionesConsultaDigemidItems" in the database. The results are returned as a list of
-        dictionaries, where each dictionary represents a row in the result set.
-        """
 
         server = '154.53.44.5\SQLEXPRESS'
         database = 'BDCOMPRESOFT'
@@ -136,37 +117,16 @@ class Digemid(Page):
             conn.close()
 
         return resultados
-           
-              
+    
+    """        
+    def medirTiempo(self, tiempo_inicial, tiempo_mensaje):
+        tiempo_final = time()
+        tiempo_total = tiempo_final - tiempo_inicial
+        print("Tiempo {0}: {1} segundos".format(tiempo_mensaje, tiempo_total))
+    """
+
     # Paso 3                        
-    def step_3(self, key_group, key_concent,nombre_producto, key_codGrupoFF):   
-        """
-        The function `step_3` takes in several parameters, makes a POST
-        request to a specific URL with the given payload, and extracts data
-        from the response to create a list of Product objects.
-        
-        :param key_group: The key_group parameter is used to specify the code
-        of the product group. It is expected to be an integer value
-        :param key_concent: The parameter "key_concent" is used to specify the
-        concentration of the product. It is a key that represents the
-        concentration value of the product
-        :param key_codGrupoFF: The parameter "key_codGrupoFF" is used to
-        specify the code of the product group. It is used in the API request
-        to filter the products based on their group
-        :param departament_id: The `departament_id` parameter represents the
-        code for the department (or region) where the product is being
-        searched for. It is used to filter the search results based on the
-        specified department
-        :param province_id: The parameter "province_id" is used to specify the
-        code of the province for which you want to retrieve data. It is used
-        in the API request to filter the results based on the specified
-        province
-        :param ubigeo_id: The `ubigeo_id` parameter is used to specify the
-        code for a specific location in Peru. It is a unique identifier for a
-        geographical area and is used to filter the search results for
-        products in that particular location
-        :return: a list of Product objects.
-        """     
+    def step_3(self, key_group, key_concent,nombre_producto, key_codGrupoFF):
         product_code = key_group
         concent = key_concent
         codGrupoFF = key_codGrupoFF
@@ -295,11 +255,7 @@ class Digemid(Page):
         return products if products else None
     
     def step_4(self, product):
-        """
-            For next call need data
-            codigoProducto":53725,"         ====> codProdE  ====> name
-            codEstablecimiento":"0053974"   ====> codEstab  ====> id_sku
-        """
+
         codigoProducto = int(product.name)
         codEstablecimiento = f"{product.id_sku}" 
         key_concent = f"{product.presentation}" 
@@ -329,8 +285,10 @@ class Digemid(Page):
             'TE': 'trailers'
         }
 
+        #tiempo_inicial = time()
         response_json = download_json(method="POST", url = url_post, headers=headers, data=payload)
-        
+        #self.medirTiempo(tiempo_inicial, "download_json")
+
         if not response_json:
             print("response_json is None")
             return None
