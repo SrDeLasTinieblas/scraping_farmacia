@@ -32,8 +32,8 @@ jobs:
       run: |
         $commit_message=$(git log -1 --pretty=%B)
         if ($commit_message -like '*action*') {
-          cd backend/scrapy/                       
-          python __main__.py      
+          cd backend/scrapy-digemid/                       
+          python __main2__.py      
         } else {
           Write-Host "Commit message does not contain the required keyword. Skipping execution."
         }
