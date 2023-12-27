@@ -72,7 +72,7 @@ def main():
 
     if len(resultados) > 0:
         for resultado in resultados:
-            #print(f"resultado -><- {resultado}")
+            print(f"resultado -><- {resultado}")
             nombre_de_product = resultado['PROD_NOMBRE']
             concentracion = resultado['PROD_CONCENTRACION']
             #tiempo_inicial = time()

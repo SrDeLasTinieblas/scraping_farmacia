@@ -1,4 +1,5 @@
 import json
+import re
 from model.Models import Product
 from pages.base.base import Page
 from utils.NetUtils import download_json
@@ -213,10 +214,32 @@ class BaseResponseFarma(Page):
             fractionated_form = json["fractionatedForm"]
             
             presentacion = json["presentation"]
+                        
+            #palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg', 'un', ' un']
+            palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']
             
+            
+            if not name:
+                mg_values = None
+                
+            mg_values = []
+            for palabra in palabras_clave:
+                #print("buscando valor: " + palabra)
+                values = re.findall(rf'(\d+){palabra}', name.lower())
+                mg_values.extend(values)
+            
+            if mg_values:
+                primer_valor_mg_values = int(mg_values[0])
+            elif not mg_values:
+                primer_valor_mg_values = 0
+                palabra = ''
+                
+                
+                
             product = Product(
                 id_sku = sku_mifarma,
                 name =  name,
+                concentracion = str(primer_valor_mg_values) + palabra,
                 presentation =  f"{presentacion}",
                 brand = brand,
                 price =  f"{price:.2f}",

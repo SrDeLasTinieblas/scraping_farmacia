@@ -42,7 +42,7 @@ class Product:
         
         def show_information(self):
             # Convierte el objeto Product a una cadena en el formato deseado
-            return f"{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
+            return f"{self.id_sku}|{self.name}|{self.presentation}|{self.concentracion}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
                 
         
 '''

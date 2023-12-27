@@ -51,7 +51,7 @@ class BoticasPeru(Page):
             while is_equals:
                 conter += 1
                 
-                final_category_url =  f"{category_url["id"]}?p={conter}"
+                final_category_url =  f"{category_url['id']}?p={conter}"
                 #print(f"Pag :: {final_category_url}")
                 products_url_internal = []
                 
@@ -99,7 +99,30 @@ class BoticasPeru(Page):
 
         return None
                
-                   
+                 
+    def get_MG(self, name):
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        
+        #name = json["name"]
+        
+        if not name:
+            mg_values = None
+            
+        mg_values = []
+        for palabra in palabras_clave:
+            #print("buscando valor: " + palabra)
+            values = re.findall(rf'(\d+){palabra}', name.lower())
+            mg_values.extend(values)
+        
+        if mg_values:
+            primer_valor_mg_values = int(mg_values[0])
+        elif not mg_values:
+                primer_valor_mg_values = ''
+                palabra = ''
+            
+        return primer_valor_mg_values, palabra
+                     
+                         
     def get_product(self, url_product):
         
         html = download_page(url_product)
@@ -192,9 +215,12 @@ class BoticasPeru(Page):
                 prices_info = first_item.get("price_info")
                 final_price = prices_info["final_price"]
                 
+                primer_valor_mg_values, palabra = self.get_MG(name)
+
                 product = Product(
                     id_sku = sku_text if name else None,
                     name =  name if name else None,
+                    concentracion = str(primer_valor_mg_values) + str(palabra),
                     presentation =  presentation if presentation else None,
                     brand =  None,
                     price =  final_price if final_price else None,

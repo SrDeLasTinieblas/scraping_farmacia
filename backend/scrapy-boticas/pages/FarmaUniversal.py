@@ -111,6 +111,26 @@ class FarmaUniversal(Page):
         
             
                     
+    def get_MG(self, name):
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        
+        if not name:
+            mg_values = None
+            
+        mg_values = []
+        for palabra in palabras_clave:
+            #print("buscando valor: " + palabra)
+            values = re.findall(rf'(\d+){palabra}', name.lower())
+            mg_values.extend(values)
+        
+        if mg_values:
+            primer_valor_mg_values = int(mg_values[0])
+        elif not mg_values:
+                primer_valor_mg_values = ''
+                palabra = ''
+            
+        return primer_valor_mg_values, palabra        
+                            
                             
     def get_product(self, url_product):
         html = download_page(url_product)
@@ -152,6 +172,7 @@ class FarmaUniversal(Page):
 
             # Convierte la cadena resultante a un número de punto flotante
             parsed_price = float(price_digits)
+            primer_valor_mg_values, palabra = self.get_MG(name)
 
             #print("parsed_price: ", parsed_price)
 
@@ -164,6 +185,8 @@ class FarmaUniversal(Page):
             product = Product(
                     id_sku = sku if sku else None,
                     name =  name if name else None,
+                    concentracion = str(primer_valor_mg_values) + str(palabra),
+
                     presentation =  None,
                     brand =  None,
                     price = parsed_price if parsed_price else None,

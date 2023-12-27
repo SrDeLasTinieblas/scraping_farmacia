@@ -8,9 +8,10 @@ class Category:
 
 class Product:   
         
-        def __init__(self, id_sku, name, presentation, brand, price, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment, description):
+        def __init__(self, id_sku, name,concentracion, presentation, brand, price, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment, description):
             self.id_sku = id_sku
             self.name = name
+            self.concentracion = concentracion
             self.presentation = presentation
             self.brand = brand
             self.price = price
@@ -60,7 +61,7 @@ class Product:
         
         def show_information(self):
             # Convierte el objeto Product a una cadena en el formato deseado
-            return f"{self.id_sku}|{self.name}|{self.presentation}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
+            return f"{self.id_sku}|{self.name}|{self.presentation}|{self.concentracion}|{self.brand}|{self.price}|{self.laboratory}|{self.card_discount}|{self.crossed_price}|{self.suggested_comment}|{self.lifting_date}|{self.description}|{self.source_information}"    
         
         '''
         def show_information(self):

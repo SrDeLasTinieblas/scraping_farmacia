@@ -1,3 +1,4 @@
+import re
 import requests
 import json
 from model.Models import Product
@@ -30,7 +31,12 @@ class BoticasSalud(Page):
         return categories
     
     def get_product_urls(self, category_slug):
-        url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug["id"]}&filterBy=2&CurrentPage=1&PageSize=1"
+        if 'id' not in category_slug:
+            print(f"{category_slug['id']} : 'id' No hay datos disponible")
+            return None
+
+        url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug['id']}&filterBy=2&CurrentPage=1&PageSize=1"
+        
         response_data = download_json(url)
         if not response_data:
             #print(f"{self.title} : Hubo un error al descargar category = {category_slug}")
@@ -38,7 +44,7 @@ class BoticasSalud(Page):
         
         try:
             total_items = response_data["data"]["totalItems"]
-            url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug["id"]}&filterBy=2&CurrentPage=1&PageSize={total_items}"
+            url = f"https://bys-prod-backend.azurewebsites.net/api/ServiceProduct?filterValue={category_slug['id']}&filterBy=2&CurrentPage=1&PageSize={total_items}"
             response_data = download_json(url)
             
             products_slug = []
@@ -52,11 +58,33 @@ class BoticasSalud(Page):
             return products_slug 
         
         except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer datos en {category_slug["id"]} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_slug['id']} -> {str(e)}")      
 
         return None
            
               
+    def get_MG(self, name):
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        
+        #name = json["name"]
+        
+        if not name:
+            mg_values = None
+            
+        mg_values = []
+        for palabra in palabras_clave:
+            #print("buscando valor: " + palabra)
+            values = re.findall(rf'(\d+){palabra}', name.lower())
+            mg_values.extend(values)
+        
+        if mg_values:
+            primer_valor_mg_values = int(mg_values[0])
+        elif not mg_values:
+                primer_valor_mg_values = ''
+                palabra = ''
+            
+        return primer_valor_mg_values, palabra
+                     
                        
     def get_product(self, product_slug):
         
@@ -79,11 +107,16 @@ class BoticasSalud(Page):
             product_brand = item["productBrand"]
             brand = product_brand["title"]
             sku_id = item["skuIdClient"]
+            details = item["details"]
 
+
+            if '"' in title:
+                title = title.replace('"', '')
 
             laboratory = next((details["description"] for details in item["details"] if details["name"] == "Laboratorio"), None)
 
             presentations = item["presentations"]
+            primer_valor_mg_values, palabra = self.get_MG(details[1]["description"])
 
             for presentation in presentations:  
                 discounted_price = presentation["discountedPrice"]              
@@ -96,10 +129,12 @@ class BoticasSalud(Page):
                     price = discounted_price
                     crossed_price = presentation["price"]
                        
-                                
+            
+            
                 product = Product(
                     id_sku=sku_id if sku_id else None,
                     name=title if title else None,
+                    concentracion = str(primer_valor_mg_values) + str(palabra),
                     presentation= title_presentation if title_presentation else None,
                     brand=brand,
                     price=f"{price:.2f}" if price else None,

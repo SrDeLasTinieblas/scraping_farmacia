@@ -13,6 +13,13 @@ import numpy as np
 import time
 import pyodbc
 #from tqdm import tqdm  # Importa la función tqdm
+from colorama import Fore
+
+def print_error(message):
+    print(f"{Fore.RED}Error: {message}{Fore.RESET}")
+
+def print_success(message):
+    print(f"{Fore.GREEN}Success: {message}{Fore.RESET}")
 
 def get_category_and_product_info(botica):
     categories = botica.get_categories()
@@ -140,18 +147,32 @@ def scrape_selected_pages(selected_pags):
                 else:
                     products_black_list.append(product_url)
 
-        chunk_size = 50
+        chunk_size = 500
         simbol_concantened = "¬"
         chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
 
+        count = 0
         # Recorrer los trozos
         for chunk in chunks:
             product_texts = [product_internal.show_information() for product_internal in chunk]
             
             final_products_text = simbol_concantened.join(product_texts)
             final_products_text = f"{botica.id}¯{final_products_text}" #{simbol_concantened}"
-            print(final_products_text)       
-            upload_to_db(final_products_text)
+            count +=1
+            
+            try:
+                upload_to_db(final_products_text)
+                with open(f"Output{count}.txt", "w") as text_file:
+                    text_file.write(products_internal_all)
+                    
+                print_success(f"{count} Lote subido exitosamente.")
+            except Exception as e:
+                print_error(f"Error al subir el lote: {str(e)}")
+            
+            #upload_to_db(final_products_text)
+            print(final_products_text)
+    print(f"\nTamaño total de productos subidos: {len(products_internal_all)}")
+    
 
 
 # Obtener las páginas disponibles

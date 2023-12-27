@@ -109,9 +109,9 @@ class HogarSalud(Page):
                         # https://www.hogarysalud.com.pe/c/salud-y-bienestar/page/2/?per_page=100
                         
                 if conter == 1:
-                    final_category_url = f"{category_url["id"]}?per_page=36"
+                    final_category_url = f"{category_url['id']}?per_page=36"
                 elif conter >= 2:
-                    final_category_url = f"{category_url["id"]}page/{conter}/?per_page=36"
+                    final_category_url = f"{category_url['id']}page/{conter}/?per_page=36"
                     
                 #print(f"Pag :: {final_category_url}")
                 html = download_page(final_category_url)
@@ -132,11 +132,31 @@ class HogarSalud(Page):
 
             return products_url             
         except Exception as e: 
-            print(f"{self.title} : Hubo un error al extraer datos en {category_url["id"]} -> {str(e)}")      
+            print(f"{self.title} : Hubo un error al extraer datos en {category_url['id']} -> {str(e)}")      
 
         return None            
         
-                    
+    def get_MG(self, name):
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        
+        #name = json["name"]
+        
+        if not name:
+            mg_values = None
+            
+        mg_values = []
+        for palabra in palabras_clave:
+            #print("buscando valor: " + palabra)
+            values = re.findall(rf'(\d+){palabra}', name.lower())
+            mg_values.extend(values)
+        
+        if mg_values:
+            primer_valor_mg_values = int(mg_values[0])
+        elif not mg_values:
+                primer_valor_mg_values = ''
+                palabra = ''
+            
+        return primer_valor_mg_values, palabra
                             
     def get_product(self, url_product):
                 
@@ -156,6 +176,7 @@ class HogarSalud(Page):
 
             
             forms = soup.find_all('form')
+            primer_valor_mg_values, palabra = self.get_MG(name)
 
             is_single = True
             for form in forms:
@@ -170,6 +191,7 @@ class HogarSalud(Page):
                         product = Product(
                             id_sku=sku_id if sku_id else None,
                             name=name if name else None,
+                            concentracion = str(primer_valor_mg_values) + str(palabra),
                             presentation = presentacion_attr if presentacion_attr else None,
                             brand=None, 
                             price=f"{price:.2f}" if price else None,

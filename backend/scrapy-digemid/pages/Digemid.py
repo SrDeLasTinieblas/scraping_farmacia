@@ -177,7 +177,7 @@ class Digemid(Page):
         
         data = response_json["data"]
         if not data:
-            #print(f"{self.title} : Hubo un error al obtener [data] en el producto {key_group}")
+            print(f"{self.title} : Hubo un error al obtener [data] en el producto {key_group}")
             return None
         
         products_dic = {}   
