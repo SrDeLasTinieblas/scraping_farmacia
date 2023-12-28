@@ -31,7 +31,7 @@ class FarmaUniversal(Page):
                 
                 categories.append({"id": href, "name": title})
 
-        print("categories: ", categories)
+        #print("categories: ", categories)
         return categories
 
     def get_product_urls(self, category_url):

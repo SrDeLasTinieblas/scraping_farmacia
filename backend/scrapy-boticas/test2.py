@@ -11,8 +11,6 @@ from utils.UploadDatabase import upload_to_db
 import concurrent.futures
 import numpy as np
 import time
-import pyodbc
-#from tqdm import tqdm  # Importa la función tqdm
 from colorama import Fore
 
 def print_error(message):
@@ -27,28 +25,18 @@ def get_category_and_product_info(botica):
     total_categories = len(categories)
     print(f"Tamaño de categorías en {botica.name}: {total_categories}")
     
-    #if botica.name == 'Farmacia Universal':
-      #  selected_categories_boticas_universal = get_selected_categories(categories, lambda category: category.name)
-    #if botica.name == 'Inkafarma':
-     #   selected_categories_inkafarma = get_selected_categories(categories, lambda category: category["name"])
-
-    # Preguntar al usuario qué categorías quiere scrapear
     selected_categories = get_selected_categories(categories)
     
     total_products = 0
     print("Procesando informacion...")
     inicio = time.time()
 
-    #for category_url in tqdm(selected_categories, desc="Obteniendo productos", unit="categoría"):
     for category_url in selected_categories:
-        #print("category_url: ", category_url)
         total_products += len(botica.get_product_urls(category_url))
 
     #print(f"Tamaño total de productos en {botica.name}: {total_products}")
     fin = time.time()
     tiempo_transcurrido = fin - inicio
-    print("Procesando informacion...")
-    #print(f">>> Tiempo transcurrido para obtener todos los URLs de productos es: {tiempo_transcurrido:.2f} segundos")
 
     return selected_categories, total_products
 
@@ -62,50 +50,6 @@ def get_selected_categories(all_categories):
     answers = inquirer.prompt(questions)
     selected_categories = answers.get('categories', [])
     return selected_categories
-
-
-# Uso para Boticas Universal
-#selected_categories_boticas_universal = get_selected_categories(all_categories_boticas_universal, lambda category: category.name)
-
-# Uso para Inkafarma
-#selected_categories_inkafarma = get_selected_categories(all_categories_inkafarma, lambda category: category["name"])
-
-
-"""
-
-
-def get_selected_categories(all_categories, map_function):
-    questions = [
-        inquirer.Checkbox('categories',
-                          message='Selecciona las categorías para el scraping:',
-                          choices=[(map_function(category), category) for category in all_categories])
-    ]
-    answers = inquirer.prompt(questions)
-    selected_categories = answers.get('categories', [])
-    return selected_categories
-    
-
-def get_selected_categories(all_categories):
-    questions = [
-        inquirer.Checkbox('categories',
-                          message='Selecciona las categorías para el scraping:',
-                          choices=[(category.name, category) for category in all_categories])
-    ]
-    answers = inquirer.prompt(questions)
-    selected_categories = answers.get('categories', [])
-    return selected_categories
-
-
-def get_selected_categories(all_categories):
-    questions = [
-        inquirer.Checkbox('categories',
-                          message='Selecciona las categorías para el scraping:',
-                          choices=[(category["name"], category) for category in all_categories])
-    ]
-    answers = inquirer.prompt(questions)
-    selected_categories = answers.get('categories', [])
-    return selected_categories
-"""
 
 def download_product(botica, product_url):
     try:
@@ -167,19 +111,13 @@ def scrape_selected_pages(selected_pags):
             try:
                 upload_to_db(final_products_text)
                 
-                # Convertir la lista en una cadena con saltos de línea entre cada elemento
-                #final_products_str = '\n'.join(map(str, final_products_text))
-                
-                #with open(f"final_products_str{count}.txt", "w", encoding="utf-8") as text_file:
-                    #   text_file.write(final_products_text)
+                with open(f"final_products_text {count}.txt", "w", encoding="utf-8") as text_file:
+                       text_file.write(final_products_text)
                     
                 print_success(f"{count} Lote subido exitosamente.")
             except Exception as e:
                 print_error(f"Error al subir el lote: {str(e)}")
 
-            
-            #upload_to_db(final_products_text)
-            #print(final_products_text)
     print("Se culminó satisfactoriamente el proceso")
     print(f"\n Se han registrado {len(products_internal_all)} productos")
     
@@ -194,8 +132,6 @@ pages_with_categories = [
     Page(name="Inkafarma", value="https://inkafarma.pe/")
 ]
 
-
-# Preguntar al usuario qué páginas quiere scrapear con categorías
 questions = [
     inquirer.Checkbox('pages',
                       message='Selecciona las páginas para el scraping:',
@@ -205,7 +141,6 @@ answers = inquirer.prompt(questions)
 
 selected_pages = answers.get('pages', [])
 
-# Llamar a la función de scraping solo si se seleccionaron páginas
 if selected_pages:
     scrape_selected_pages(selected_pages)
 else:

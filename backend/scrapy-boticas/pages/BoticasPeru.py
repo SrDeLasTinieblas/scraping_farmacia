@@ -36,7 +36,7 @@ class BoticasPeru(Page):
                         categories.append({"id": href_value, "name": title_value})
 
                         #categorys.append(href_value)               
-        print("categories: ", categories)
+        #print("categories: ", categories)
         return categories
     
     

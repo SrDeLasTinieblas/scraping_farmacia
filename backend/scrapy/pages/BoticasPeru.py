@@ -63,7 +63,7 @@ class BoticasPeru(Page):
                                 products_url_internal.append(product_link)
                                 
                     else :
-                        print(f"{self.title} : Hubo un error al descargar el category = {final_category_url}")  
+                        #print(f"{self.title} : Hubo un error al descargar el category = {final_category_url}")  
                         products_url_internal = None           
                                 
                 except Exception as e:
