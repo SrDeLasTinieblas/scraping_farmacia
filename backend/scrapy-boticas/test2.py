@@ -22,6 +22,7 @@ def print_success(message):
     print(f"{Fore.GREEN}Success: {message}{Fore.RESET}")
 
 def get_category_and_product_info(botica):
+    
     categories = botica.get_categories()
     total_categories = len(categories)
     print(f"Tamaño de categorías en {botica.name}: {total_categories}")
@@ -35,6 +36,7 @@ def get_category_and_product_info(botica):
     selected_categories = get_selected_categories(categories)
     
     total_products = 0
+    print("Procesando informacion...")
     inicio = time.time()
 
     #for category_url in tqdm(selected_categories, desc="Obteniendo productos", unit="categoría"):
@@ -42,10 +44,11 @@ def get_category_and_product_info(botica):
         #print("category_url: ", category_url)
         total_products += len(botica.get_product_urls(category_url))
 
-    print(f"Tamaño total de productos en {botica.name}: {total_products}")
+    #print(f"Tamaño total de productos en {botica.name}: {total_products}")
     fin = time.time()
     tiempo_transcurrido = fin - inicio
-    print(f">>> Tiempo transcurrido para obtener todos los URLs de productos es: {tiempo_transcurrido:.2f} segundos")
+    print("Procesando informacion...")
+    #print(f">>> Tiempo transcurrido para obtener todos los URLs de productos es: {tiempo_transcurrido:.2f} segundos")
 
     return selected_categories, total_products
 
@@ -117,8 +120,7 @@ def scrape_selected_pages(selected_pags):
         "https://boticasperu.pe/": BoticasPeru(),
         "https://www.hogarysalud.com.pe": HogarSalud(),
         "https://farmaciauniversal.com/": FarmaUniversal(),
-        "https://inkafarma.pe/": Inkafarma(),
-        # Agrega más instancias según sea necesario
+        "https://inkafarma.pe/": Inkafarma()
     }
 
     boticas = []
@@ -147,7 +149,8 @@ def scrape_selected_pages(selected_pags):
                 else:
                     products_black_list.append(product_url)
 
-        chunk_size = 500
+
+        chunk_size = 100
         simbol_concantened = "¬"
         chunks = np.array_split(products_internal_all, np.ceil(len(products_internal_all) / chunk_size))
 
@@ -157,21 +160,28 @@ def scrape_selected_pages(selected_pags):
             product_texts = [product_internal.show_information() for product_internal in chunk]
             
             final_products_text = simbol_concantened.join(product_texts)
+            #final_products_text = final_products_text.replace("'", "").replace('"', '').replace('#', '').replace('--', '-')
             final_products_text = f"{botica.id}¯{final_products_text}" #{simbol_concantened}"
             count +=1
             
             try:
                 upload_to_db(final_products_text)
-                with open(f"Output{count}.txt", "w") as text_file:
-                    text_file.write(products_internal_all)
+                
+                # Convertir la lista en una cadena con saltos de línea entre cada elemento
+                #final_products_str = '\n'.join(map(str, final_products_text))
+                
+                #with open(f"final_products_str{count}.txt", "w", encoding="utf-8") as text_file:
+                    #   text_file.write(final_products_text)
                     
                 print_success(f"{count} Lote subido exitosamente.")
             except Exception as e:
                 print_error(f"Error al subir el lote: {str(e)}")
+
             
             #upload_to_db(final_products_text)
-            print(final_products_text)
-    print(f"\nTamaño total de productos subidos: {len(products_internal_all)}")
+            #print(final_products_text)
+    print("Se culminó satisfactoriamente el proceso")
+    print(f"\n Se han registrado {len(products_internal_all)} productos")
     
 
 
@@ -181,8 +191,7 @@ pages_with_categories = [
     Page(name="Botica Peru", value="https://boticasperu.pe/"),
     Page(name="Hogar y Salud", value="https://www.hogarysalud.com.pe"),
     Page(name="Farmacia Universal", value="https://farmaciauniversal.com/"),
-    Page(name="Inkafarma", value="https://inkafarma.pe/"),
-    # Agrega más instancias según sea necesario
+    Page(name="Inkafarma", value="https://inkafarma.pe/")
 ]
 
 

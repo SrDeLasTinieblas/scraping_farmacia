@@ -39,8 +39,8 @@ class BaseResponseFarma(Page):
             #categories.append({"id": category_id, "name": category_name})
             categories.append({"id": category_id, "name": category_name})
 
-        print("category_url: ", category_url)        
-        print("categories: ", categories)              
+        #print("category_url: ", category_url)        
+        #print("categories: ", categories)              
         return categories
 
     

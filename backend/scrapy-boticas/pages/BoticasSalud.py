@@ -58,13 +58,14 @@ class BoticasSalud(Page):
             return products_slug 
         
         except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer datos en {category_slug['id']} -> {str(e)}")      
+            #print(f"{self.title} : Hubo un error al extraer datos en {category_slug['id']} -> {str(e)}")    
+            return False  
 
         return None
            
               
     def get_MG(self, name):
-        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg', 'gr', ' gr']
         
         #name = json["name"]
         
@@ -110,13 +111,16 @@ class BoticasSalud(Page):
             details = item["details"]
 
 
-            if '"' in title:
-                title = title.replace('"', '')
+            #if '"' || ''in title:
+             #   title = title.replace('"', '')
+                
+            title_cleaned = title.replace("'", "").replace('"', '').replace('  ', '')
 
             laboratory = next((details["description"] for details in item["details"] if details["name"] == "Laboratorio"), None)
 
             presentations = item["presentations"]
-            primer_valor_mg_values, palabra = self.get_MG(details[1]["description"])
+            #primer_valor_mg_values, palabra = self.get_MG(details[1]["description"])
+            primer_valor_mg_values, palabra = self.get_MG(title)
 
             for presentation in presentations:  
                 discounted_price = presentation["discountedPrice"]              
@@ -130,21 +134,20 @@ class BoticasSalud(Page):
                     crossed_price = presentation["price"]
                        
             
-            
                 product = Product(
                     id_sku=sku_id if sku_id else None,
-                    name=title if title else None,
+                    name=title_cleaned if title_cleaned else None,
                     concentracion = str(primer_valor_mg_values) + str(palabra),
                     presentation= title_presentation if title_presentation else None,
-                    brand=brand,
+                    brand=brand if brand else None,
                     price=f"{price:.2f}" if price else None,
                     source_information=self.title if self.title else None,
                     lifting_date=None,
                     laboratory=laboratory if laboratory else None,
                     card_discount=f"{discounted_price:.2f}" if discounted_price else None,
-                    crossed_price=crossed_price,
+                    crossed_price=crossed_price if crossed_price else None,
                     suggested_comment=None,
-                    description=description
+                    description=description if description else None,
                 )
                 products.append(product)
                 
@@ -205,7 +208,8 @@ class BoticasSalud(Page):
             """ 
 
         except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer datos en {product_slug} -> {str(e)}")          
+            #print(f"{self.title} : Hubo un error al extraer datos en {product_slug} -> {str(e)}")          
+            print(f"{self.title} : Productos vacios {product_slug} -> {str(e)}")          
             
             
         return products if products else None

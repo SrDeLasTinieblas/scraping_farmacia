@@ -1,4 +1,5 @@
 import json
+import re
 from model.Models import Product
 from pages.base.base import Page
 from bs4 import BeautifulSoup
