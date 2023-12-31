@@ -127,15 +127,15 @@ for botica in boticas:
     tag = botica.title
     
     categories = botica.get_categories()
-    print("categories", categories)
-    for category_url, category_title in list(categories.items()):#[:3]:
+    #print("categories", categories)
+    for category_url, category_title in list(categories.items()):
     #for category_url, category_title in list(categories.items()):
-        print(tag, ">>>> ",category_title, ":", category_url)
+        #print(tag, ">>>> ",category_title, ":", category_url)
         
         products_url = botica.get_product_urls(category_url)
         
         if not products_url:
-            print(f"{tag} >>> Hubo un error en la categoria {category_title} - {category_url}")
+            #print(f"{tag} >>> Hubo un error en la categoria {category_title} - {category_url}")
             continue        
                
         products_url = list(set(products_url))            
@@ -144,7 +144,6 @@ for botica in boticas:
         
         # All Products
         products_internal_all = []
-        
         
         # Fack MultiTasking
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:

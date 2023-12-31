@@ -1,3 +1,5 @@
+from html import unescape
+import json
 import traceback
 from model.Models import Product
 from pages.base.base import Page
@@ -112,7 +114,7 @@ class FarmaUniversal(Page):
             
                     
     def get_MG(self, name):
-        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']#, 'un', ' un']
+        palabras_clave = ['ml', ' ml', ' gr', 'gr', 'mg', ' mg']#, 'un', ' un']
         
         if not name:
             mg_values = None
@@ -141,11 +143,14 @@ class FarmaUniversal(Page):
         products = []    
             
         try:
-            soup = BeautifulSoup(html, 'html.parser')     
+            soup = BeautifulSoup(html, 'html.parser')
             name = soup.find('meta', {'property': 'og:title'})["content"]
             # Busca el elemento <span> dentro del <p> con la clase específica
-            span_element = soup.find('p', class_='texto codigo izquierda alto2 rojo talla14 em2').find('span')
+            # Encuentra el script con el tipo de aplicación "application/ld+json"
+            script_tag = soup.find('script', {'type': 'application/ld+json'})
+            #span_element = soup.find('p', class_='texto codigo izquierda alto2 rojo talla14 em2').find('span')
 
+            """
             if span_element:
                 # Extrae el texto dentro del span
                 sku_text = span_element.text.strip()
@@ -160,7 +165,36 @@ class FarmaUniversal(Page):
                     print("No se encontraron números en el SKU.")
             else:
                 print("Elemento <span> no encontrado.")
+            """
+
+
+            if script_tag:
+                # Obtiene el contenido del script como texto
+                script_content = script_tag.string
+                #cleaned_script_content = ''.join(char for char in script_content if ord(char) > 31 or char in '\t\n\r')
+
+                # Analiza el contenido JSON del script
+                # Decodificar caracteres especiales HTML a su forma original
+                #decoded_script_content = unescape(script_content)
+                #json_data = json.loads(decoded_script_content)
+                # Utilizar expresiones regulares para eliminar caracteres especiales
+                cleaned_json_string = re.sub(r'[^a-zA-Z0-9{}":,./\-_ ]', '', script_content)
+
+                json_data = json.loads(cleaned_json_string)
+
+                # Imprimir la cadena JSON limpia
+                print(json_data['sku'])
                 
+                # Verifica si el campo "sku" existe en el script JSON
+                #if 'sku' in json_data:
+                sku_value = json_data['sku']
+                 #   print(f"SKU encontrado: {sku_value}")
+                #else:
+                 #   print("Campo 'sku' no encontrado en el script JSON.")
+            else:
+                print("Script no encontrado.")
+                
+    
             productos_datos = soup.find('div', {'id': 'productos_datos'})
             #print("productos_datos", productos_datos)
             
@@ -172,7 +206,8 @@ class FarmaUniversal(Page):
 
             # Convierte la cadena resultante a un número de punto flotante
             parsed_price = float(price_digits)
-            primer_valor_mg_values, palabra = self.get_MG(name)
+            title_cleaned = name.replace("'", "").replace('"', '').replace('  ', '')
+            primer_valor_mg_values, palabra = self.get_MG(title_cleaned)
 
             #print("parsed_price: ", parsed_price)
 
@@ -181,12 +216,15 @@ class FarmaUniversal(Page):
                crossed_price = crossed_price.find('span')
                if crossed_price:
                   crossed_price = crossed_price.text
-                
-            product = Product(
-                    id_sku = sku if sku else None,
-                    name =  name if name else None,
-                    concentracion = str(primer_valor_mg_values) + str(palabra),
+                  #crossed_price.replace("S/", "")
+                  crossed_price = re.sub(r'\D', '', crossed_price)
 
+        
+        
+            product = Product(
+                    id_sku = sku_value if sku_value else None,
+                    name =  title_cleaned if title_cleaned else None,
+                    concentracion = str(primer_valor_mg_values) + str(palabra),
                     presentation =  None,
                     brand =  None,
                     price = parsed_price if parsed_price else None,

@@ -34,7 +34,7 @@ def get_category_and_product_info(botica):
     for category_url in selected_categories:
         total_products += len(botica.get_product_urls(category_url))
 
-    #print(f"Tamaño total de productos en {botica.name}: {total_products}")
+    print(f"Tamaño total de productos en {botica.name}: {total_products}")
     fin = time.time()
     tiempo_transcurrido = fin - inicio
 
@@ -75,7 +75,7 @@ def scrape_selected_pages(selected_pags):
             categories, total_products = get_category_and_product_info(botica_instance)
             boticas.append((botica_instance, total_products, categories))
 
-    for botica, total_products, categories in boticas:
+    for botica, total_products, categories in boticas:#[:3]:
         print("_" * 20)
         print(f"Botica: {botica.name}")
 
@@ -110,16 +110,20 @@ def scrape_selected_pages(selected_pags):
             
             try:
                 upload_to_db(final_products_text)
-                
-                with open(f"final_products_text {count}.txt", "w", encoding="utf-8") as text_file:
-                       text_file.write(final_products_text)
+                #final_products_text.show_information()
+                #print(final_products_text)
+                #with open(f"{botica.id} {count}.txt", "w", encoding="utf-8") as text_file:
+                 #      text_file.write(final_products_text)
                     
                 print_success(f"{count} Lote subido exitosamente.")
             except Exception as e:
                 print_error(f"Error al subir el lote: {str(e)}")
-
-    print("Se culminó satisfactoriamente el proceso")
-    print(f"\n Se han registrado {len(products_internal_all)} productos")
+                
+    #with open(f"{botica.id} {count}.txt", "w", encoding="utf-8") as text_file:
+     #       text_file.write(products_internal_all)
+            
+        print("Se culminó satisfactoriamente el proceso")
+        print(f"\n Se han registrado {len(products_internal_all)} productos")
     
 
 

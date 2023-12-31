@@ -41,6 +41,7 @@ def upload_to_db(text_upload):
         return True 
     except Exception as e:
         print(f"Error al cargar en la base de datos: {str(e)}")
+        print("\n Error: ", text_upload)
         traceback.print_exc()
         return False
     

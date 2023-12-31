@@ -115,7 +115,28 @@ class BaseResponseFarma(Page):
 
         return None
              
-                    
+    def get_MG(self, name):
+        palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg', 'gr', ' gr']
+        
+        #name = json["name"]
+        
+        if not name:
+            mg_values = None
+            
+        mg_values = []
+        for palabra in palabras_clave:
+            #print("buscando valor: " + palabra)
+            values = re.findall(rf'(\d+){palabra}', name.lower())
+            mg_values.extend(values)
+        
+        if mg_values:
+            primer_valor_mg_values = int(mg_values[0])
+        elif not mg_values:
+                primer_valor_mg_values = ''
+                palabra = ''
+            
+        return primer_valor_mg_values, palabra
+                      
                               
     def get_product(self, product_id):
         
@@ -216,9 +237,9 @@ class BaseResponseFarma(Page):
             presentacion = json["presentation"]
                         
             #palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg', 'un', ' un']
-            palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']
+            #palabras_clave = ['ml', ' ml', ' gramos', 'gramos', 'mg', ' mg']
             
-            
+            """
             if not name:
                 mg_values = None
                 
@@ -233,12 +254,15 @@ class BaseResponseFarma(Page):
             elif not mg_values:
                 primer_valor_mg_values = 0
                 palabra = ''
-                
-                
-                
+            """
+            
+            title_cleaned = name.replace("'", "").replace('"', '').replace('  ', '')    
+
+            primer_valor_mg_values, palabra = self.get_MG(title_cleaned)
+
             product = Product(
                 id_sku = sku_mifarma,
-                name =  name,
+                name=title_cleaned if title_cleaned else None,
                 concentracion = str(primer_valor_mg_values) + palabra,
                 presentation =  f"{presentacion}",
                 brand = brand,

@@ -177,7 +177,9 @@ class HogarSalud(Page):
 
             
             forms = soup.find_all('form')
-            primer_valor_mg_values, palabra = self.get_MG(name)
+            
+            title_cleaned = name.replace("'", "").replace('"', '').replace('  ', '')
+            primer_valor_mg_values, palabra = self.get_MG(title_cleaned)
 
             is_single = True
             for form in forms:
@@ -191,7 +193,7 @@ class HogarSalud(Page):
                         
                         product = Product(
                             id_sku=sku_id if sku_id else None,
-                            name=name if name else None,
+                            name=title_cleaned if title_cleaned else None,
                             concentracion = str(primer_valor_mg_values) + str(palabra),
                             presentation = presentacion_attr if presentacion_attr else None,
                             brand=None, 
@@ -230,6 +232,7 @@ class HogarSalud(Page):
                 product = Product(
                     id_sku=sku_id if sku_id else None,
                     name=name if name else None,
+                    concentracion = str(primer_valor_mg_values) + str(palabra),
                     presentation = None,
                     brand=None, 
                     price=f"{price:.2f}" if price else None,

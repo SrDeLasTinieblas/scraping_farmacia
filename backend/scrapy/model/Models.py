@@ -8,10 +8,11 @@ class Category:
 
 class Product:   
         
-        def __init__(self, id_sku, name, presentation, brand, price, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment, description):
+        def __init__(self, id_sku, name, presentation,concentracion, brand, price, source_information, lifting_date, laboratory, card_discount, crossed_price, suggested_comment, description):
             self.id_sku = id_sku
             self.name = name
             self.presentation = presentation
+            self.concentracion = concentracion
             self.brand = brand
             self.price = price
             self.source_information = source_information
