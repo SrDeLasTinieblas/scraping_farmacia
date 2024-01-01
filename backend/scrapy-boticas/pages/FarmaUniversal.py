@@ -137,7 +137,7 @@ class FarmaUniversal(Page):
     def get_product(self, url_product):
         html = download_page(url_product)
         if not html:
-            print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
+            #print(f"{self.title} : Hubo un error al descargar el producto = {url_product}")
             return None
             
         products = []    
@@ -145,8 +145,7 @@ class FarmaUniversal(Page):
         try:
             soup = BeautifulSoup(html, 'html.parser')
             name = soup.find('meta', {'property': 'og:title'})["content"]
-            # Busca el elemento <span> dentro del <p> con la clase específica
-            # Encuentra el script con el tipo de aplicación "application/ld+json"
+            
             script_tag = soup.find('script', {'type': 'application/ld+json'})
             #span_element = soup.find('p', class_='texto codigo izquierda alto2 rojo talla14 em2').find('span')
 
@@ -168,33 +167,43 @@ class FarmaUniversal(Page):
             """
 
 
+            """
             if script_tag:
-                # Obtiene el contenido del script como texto
-                script_content = script_tag.string
-                #cleaned_script_content = ''.join(char for char in script_content if ord(char) > 31 or char in '\t\n\r')
-
-                # Analiza el contenido JSON del script
-                # Decodificar caracteres especiales HTML a su forma original
-                #decoded_script_content = unescape(script_content)
-                #json_data = json.loads(decoded_script_content)
-                # Utilizar expresiones regulares para eliminar caracteres especiales
-                cleaned_json_string = re.sub(r'[^a-zA-Z0-9{}":,./\-_ ]', '', script_content)
-
-                json_data = json.loads(cleaned_json_string)
-
-                # Imprimir la cadena JSON limpia
-                print(json_data['sku'])
                 
-                # Verifica si el campo "sku" existe en el script JSON
-                #if 'sku' in json_data:
-                sku_value = json_data['sku']
-                 #   print(f"SKU encontrado: {sku_value}")
-                #else:
-                 #   print("Campo 'sku' no encontrado en el script JSON.")
+                script_content = script_tag.string
+                
+                # Escapar comillas dobles dentro de la cadena JSON
+                escaped_json_string = json.dumps(script_content)
+                # Cargar la cadena JSON escapada
+                cleaned_json_string = json.loads(escaped_json_string)
+                cleaned_json_string = re.sub(r'[^a-zA-Z0-9{}":,./\-_ ]', '', cleaned_json_string)
+                cleaned_json_string = json.loads(cleaned_json_string)
+
+                print(cleaned_json_string['sku'])
+                
+                #print("cleaned_json_string: ", cleaned_json_string)
+                #json_data = json.loads(cleaned_json_string)
+
+                #print(json_data['sku'])
+                
+                sku_value = cleaned_json_string['sku']
+                 
             else:
                 print("Script no encontrado.")
+            """
                 
-    
+                
+                # Utilizar expresiones regulares para extraer el valor del campo "sku"
+
+
+            match = re.search(r'"sku":\s*"([^"]+)"', script_tag.text)
+            if match:
+                sku_value = match.group(1)
+                #print(f"{sku_value}")
+            else:
+                print("SKU no encontrado en la cadena JSON.")
+                
+            print("-" * 20)
             productos_datos = soup.find('div', {'id': 'productos_datos'})
             #print("productos_datos", productos_datos)
             
@@ -239,7 +248,7 @@ class FarmaUniversal(Page):
             products.append(product)
                     
         except Exception as e:
-            print(f"{self.title} : Hubo un error al extraer datos en {url_product} -> {str(e)}")      
+            #print(f"{self.title} : Hubo un error al extraer datos en {url_product} -> {str(e)}")      
             traceback.print_exc()
 
     

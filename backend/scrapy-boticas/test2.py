@@ -75,24 +75,30 @@ def scrape_selected_pages(selected_pags):
             categories, total_products = get_category_and_product_info(botica_instance)
             boticas.append((botica_instance, total_products, categories))
 
-    for botica, total_products, categories in boticas:#[:3]:
+    for botica, total_products, categories in boticas:
         print("_" * 20)
         print(f"Botica: {botica.name}")
 
         products_internal_all = []
         products_black_list = []
 
+        #print("categories: ", categories)
+        #print()
+
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(download_product, botica, product_url) for category_url in categories for product_url in botica.get_product_urls(category_url)]
-
-            for future in concurrent.futures.as_completed(futures):
-                product_url, products_internal = future.result()
-
-                if products_internal:
-                    products_internal_all.extend([product_internal for product_internal in products_internal if isinstance(product_internal, Product)])
-                else:
-                    products_black_list.append(product_url)
-
+            for category_url in categories:
+                product_urls = botica.get_product_urls(category_url)
+                if product_urls:
+                    futures = [executor.submit(download_product, botica, product_url) for product_url in product_urls]
+                    for future in concurrent.futures.as_completed(futures):
+                        try:
+                            product_url, products_internal = future.result()
+                            if products_internal:
+                                products_internal_all.extend([product_internal for product_internal in products_internal if isinstance(product_internal, Product)])
+                            else:
+                                products_black_list.append(product_url)
+                        except Exception as e:
+                            print(f"Error processing product URL: {product_url}, Exception: {e}")
 
         chunk_size = 100
         simbol_concantened = "¬"
@@ -114,7 +120,7 @@ def scrape_selected_pages(selected_pags):
                 #print(final_products_text)
                 #with open(f"{botica.id} {count}.txt", "w", encoding="utf-8") as text_file:
                  #      text_file.write(final_products_text)
-                    
+                 
                 print_success(f"{count} Lote subido exitosamente.")
             except Exception as e:
                 print_error(f"Error al subir el lote: {str(e)}")

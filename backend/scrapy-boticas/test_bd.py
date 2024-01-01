@@ -24,9 +24,53 @@ json_string = """{
 }"""
 
 # Utilizar expresiones regulares para eliminar caracteres especiales
-cleaned_json_string = re.sub(r'[^a-zA-Z0-9{}":,./\-_ ]', '', json_string)
+#cleaned_json_string = re.sub(r'[^a-zA-Z0-9{}":,./\-_ ]', '', json_string)
 
-json_data = json.loads(cleaned_json_string)
 
-# Imprimir la cadena JSON limpia
-print(json_data['sku'])
+cleaned_json_string = """{
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "Jalk Miel de Abeja x 1 kg",
+    "image": "assets/sources/PRODUCTOS/Miel20de20abeja20Jalk20-20120kg20-200936520-20Farmacia20Universal.jpg",
+    "description": "La miel es una sustancia dulce natural producida por las abejas a partir del neacutectar de plantas o de secreciones de partes vivas de las plantas o de excreciones de insectosnbspchupadores presentes en las partes vivas de las plantas, que las abejas recolectan, transforman combinaacutendolas con sustancias especiacuteficas de las propias, depositan,nbspdeshidratan, almacenan y las dejan en las colmenas para que madure Codex Alimentarius. Este producto es valorado por sus propiedades nutricionales, medicinales y terapeacuteuticas.RS:nbspF6005520N - NADSJL",
+    "sku": "09365",
+    "offers": {
+        "@type": "Offer",
+        "url": "https://farmaciauniversal.com/producto/detalle/3524-jalk-miel-de-abeja-x-1-kg",
+        "priceCurrency": "PEN",
+        "price": "52.90"
+    }
+}"""
+
+
+cleaned_json_string2 = """
+                {
+                "@context": "https://schema.org/", 
+                "@type": "Product", 
+                "name": "Jalk Miel de Abeja x 1 kg",
+                "image": "assets/sources/PRODUCTOS/Miel%20de%20abeja%20Jalk%20-%201%20kg%20-%2009365%20-%20Farmacia%20Universal.jpg",
+                "description": "La miel es una sustancia dulce natural producida por las abejas a partir del n&eacute;ctar de plantas o de secreciones de partes vivas de las plantas o de excreciones de insectos&nbsp;chupadores presentes en las partes vivas de las plantas, que las abejas recolectan, transforman combin&aacute;ndolas con sustancias espec&iacute;ficas de las propias, depositan,&nbsp;deshidratan, almacenan y las dejan en las colmenas para que madure "(Codex Alimentarius). Este producto es valorado por sus propiedades nutricionales, medicinales y terap&eacute;uticas.RS:&nbsp;F6005520N - NADSJL", 
+                "sku": "09365",
+                "offers": {
+                "@type": "Offer",
+                "url": "https://farmaciauniversal.com/producto/detalle/3524-jalk-miel-de-abeja-x-1-kg",
+                "priceCurrency": "PEN",
+                "price": "52.90"
+                }
+                }
+"""
+
+
+# Utilizar expresiones regulares para extraer el valor del campo "sku"
+match = re.search(r'"sku":\s*"([^"]+)"', json_string)
+if match:
+    sku_value = match.group(1)
+    print(f"SKU encontrado: {sku_value}")
+else:
+    print("SKU no encontrado en la cadena JSON.")
+    
+    
+    
+    
+    
+    
