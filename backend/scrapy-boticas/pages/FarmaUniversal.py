@@ -203,7 +203,7 @@ class FarmaUniversal(Page):
             else:
                 print("SKU no encontrado en la cadena JSON.")
                 
-            print("-" * 20)
+            #print("-" * 20)
             productos_datos = soup.find('div', {'id': 'productos_datos'})
             #print("productos_datos", productos_datos)
             
